@@ -10,11 +10,12 @@ import {
   FlatList,
   Dimensions,
 } from 'react-native';
-import { TextInput, Button, Text, Surface, HelperText, IconButton } from 'react-native-paper';
+import { TextInput, Button, Text, Surface, HelperText, IconButton, useTheme } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getCurrentUser, dummyBoards } from '../data/dummyData';
+import { useSettings } from '../context/SettingsContext';
 
 const CreatePinScreen = () => {
   const navigation = useNavigation();
@@ -31,6 +32,9 @@ const CreatePinScreen = () => {
   const [error, setError] = useState('');
   const [modalVisible, setModalVisible] = useState(true);
   const [selectBoardModalVisible, setSelectBoardModalVisible] = useState(false);
+  const { settings } = useSettings();
+  const { darkMode } = settings;
+  const theme = useTheme();
 
   useEffect(() => {
     fetchBoards();
@@ -42,7 +46,6 @@ const CreatePinScreen = () => {
   const fetchBoards = async () => {
     try {
       const currentUser = getCurrentUser();
-      // Filter boards to only show those created by the current user
       const userBoards = dummyBoards.filter(board => board.author._id === currentUser._id);
       console.log('Fetched boards:', userBoards);
       
@@ -85,10 +88,11 @@ const CreatePinScreen = () => {
   };
 
   const renderBoard = ({ item }) => (
-    <TouchableOpacity
+    <TouchableOpacity 
       onPress={() => handleBoardSelect(item._id)}
       style={[
         styles.boardCard,
+        darkMode && styles.boardCardDark,
         formData.boardId === item._id && styles.selectedBoard,
       ]}
     >
@@ -108,10 +112,10 @@ const CreatePinScreen = () => {
         </View>
         <View style={styles.boardInfo}>
           <Text style={styles.boardName} numberOfLines={2}>
-            {item.name}
+            <Text>{item.name}</Text>
           </Text>
           <Text style={styles.pinCount}>
-            {item.pins?.length || 0} pins
+            <Text>{item.pins?.length || 0} pins</Text>
           </Text>
         </View>
       </View>
@@ -134,7 +138,6 @@ const CreatePinScreen = () => {
     setError('');
 
     try {
-      // Create new pin with dummy data
       const currentUser = getCurrentUser();
       const selectedBoard = dummyBoards.find(board => board._id === formData.boardId);
       
@@ -159,13 +162,10 @@ const CreatePinScreen = () => {
 
       console.log('Created dummy pin:', newPin);
       
-      // Add the new pin to the board's pins array
       selectedBoard.pins.push(newPin);
       
-      // Navigate back to the previous screen
       navigation.goBack();
 
-      // Close the modal
       setModalVisible(false);
     } catch (error) {
       console.error('Error creating pin:', error);
@@ -185,19 +185,23 @@ const CreatePinScreen = () => {
         navigation.goBack();
       }}
     >
-      <View style={styles.modalContainer}>
+      <View style={[styles.modalContainer, {
+        backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.5)' : 'transparent',
+      }]}>
         <TouchableOpacity 
-          style={styles.overlay} 
+          style={[styles.overlay, darkMode && { backgroundColor: 'rgba(0, 0, 0, 0.9)' }]} 
           activeOpacity={1} 
           onPress={() => setModalVisible(false)}
         >
           <TouchableOpacity 
-            style={styles.modalContent}
+            style={[styles.modalContent, {
+              backgroundColor: theme.colors.surface,
+            }]}
             activeOpacity={1}
             onPress={(e) => e.stopPropagation()}
           >
             <View style={styles.modalHeader}>
-              <Text variant="headlineSmall" style={styles.title}>
+              <Text variant="headlineSmall" style={[styles.title, { color: darkMode ? '#fff' : '#000' }]}>
                 {pinId ? 'Edit Pin' : 'Create Pin'}
               </Text>
               <IconButton
@@ -219,9 +223,9 @@ const CreatePinScreen = () => {
                     resizeMode="cover"
                   />
                 ) : (
-                  <View style={styles.imagePlaceholder}>
-                    <MaterialCommunityIcons name="image-plus" size={40} color="#666666" />
-                    <Text style={styles.placeholderText}>Tap to select an image</Text>
+                  <View style={[styles.imagePlaceholder, darkMode && { backgroundColor: '#333' }]}>
+                    <MaterialCommunityIcons name="image-plus" size={40} color={darkMode ? '#fff' : '#666666'} />
+                    <Text style={[styles.placeholderText, darkMode && { color: '#fff' }]}>Tap to select an image</Text>
                   </View>
                 )}
               </TouchableOpacity>
@@ -231,10 +235,10 @@ const CreatePinScreen = () => {
                 label="Title"
                 value={formData.title}
                 onChangeText={(text) => setFormData({ ...formData, title: text })}
-                style={styles.input}
-                theme={{ colors: { text: '#FFFFFF', placeholder: '#666666' } }}
-                outlineColor="#333333"
-                activeOutlineColor="#FFFFFF"
+                style={[styles.input, { backgroundColor: darkMode ? '#333' : '#fff' }]}
+                theme={{ colors: { text: darkMode ? '#fff' : '#000', placeholder: darkMode ? '#fff' : '#666666' } }}
+                outlineColor={darkMode ? '#333333' : '#ccc'}
+                activeOutlineColor={darkMode ? '#fff' : '#333'}
               />
 
               <TextInput
@@ -244,10 +248,10 @@ const CreatePinScreen = () => {
                 onChangeText={(text) => setFormData({ ...formData, description: text })}
                 multiline
                 numberOfLines={4}
-                style={styles.input}
-                theme={{ colors: { text: '#FFFFFF', placeholder: '#666666' } }}
-                outlineColor="#333333"
-                activeOutlineColor="#FFFFFF"
+                style={[styles.input, { backgroundColor: darkMode ? '#333' : '#fff' }]}
+                theme={{ colors: { text: darkMode ? '#fff' : '#000', placeholder: darkMode ? '#fff' : '#666666' } }}
+                outlineColor={darkMode ? '#333333' : '#ccc'}
+                activeOutlineColor={darkMode ? '#fff' : '#333'}
               />
 
               <TouchableOpacity
@@ -258,13 +262,18 @@ const CreatePinScreen = () => {
                   }
                   setSelectBoardModalVisible(true);
                 }}
-                style={styles.boardSelector}
+                style={[
+                  styles.boardSelector,
+                  {
+                    backgroundColor: darkMode ? '#333' : '#fff',
+                  },
+                ]}
               >
-                <Text style={styles.boardSelectorLabel}>Board</Text>
-                <Text style={styles.boardSelectorValue}>
+                <Text style={[styles.boardSelectorLabel, { color: darkMode ? '#fff' : '#000' }]}>Board</Text>
+                <Text style={[styles.boardSelectorValue, { color: darkMode ? '#fff' : '#000' }]}>
                   {boards.find(b => b._id === formData.boardId)?.name || 'Select a board'}
                 </Text>
-                <MaterialCommunityIcons name="chevron-down" size={24} color="#FFFFFF" />
+                <MaterialCommunityIcons name="chevron-down" size={24} color={darkMode ? '#fff' : '#000'} />
               </TouchableOpacity>
 
               <Button
@@ -288,22 +297,24 @@ const CreatePinScreen = () => {
           visible={selectBoardModalVisible}
           onRequestClose={() => setSelectBoardModalVisible(false)}
         >
-          <View style={styles.modalContainer}>
+          <View style={[styles.modalContainer, {
+            backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.5)' : 'transparent',
+          }]}>
             <TouchableOpacity 
-              style={styles.overlay} 
+              style={[styles.overlay, darkMode && { backgroundColor: 'rgba(0, 0, 0, 0.9)' }]} 
               activeOpacity={1} 
               onPress={() => setSelectBoardModalVisible(false)}
             >
               <View 
-                style={styles.boardSelectionModal}
+                style={[styles.boardSelectionModal, { backgroundColor: theme.colors.surface }]}
                 onStartShouldSetResponder={() => true}
               >
-                <View style={styles.modalHeader}>
-                  <Text variant="headlineSmall" style={styles.title}>
+                <View style={[styles.modalHeader, { borderBottomColor: darkMode ? '#555' : '#ccc' }]}>
+                  <Text variant="headlineSmall" style={[styles.title, { color: darkMode ? '#fff' : '#000' }]}>
                     Select Board
                   </Text>
                   <IconButton
-                    icon={() => <MaterialCommunityIcons name="close" size={24} color="#FFFFFF" />}
+                    icon={() => <MaterialCommunityIcons name="close" size={24} color={darkMode ? '#fff' : '#000'} />}
                     size={24}
                     onPress={() => setSelectBoardModalVisible(false)}
                     style={styles.closeButton}
@@ -319,8 +330,8 @@ const CreatePinScreen = () => {
                 />
                 {boards.length === 0 && (
                   <View style={styles.emptyState}>
-                    <MaterialCommunityIcons name="folder-plus" size={48} color="#666666" />
-                    <Text style={styles.emptyStateText}>No boards yet</Text>
+                    <MaterialCommunityIcons name="folder-plus" size={48} color={darkMode ? '#ccc' : '#666666'} />
+                    <Text style={[styles.emptyStateText, { color: darkMode ? '#ccc' : '#666666' }]}>No boards yet</Text>
                     <Button
                       mode="contained"
                       onPress={() => {
@@ -339,6 +350,7 @@ const CreatePinScreen = () => {
             </TouchableOpacity>
           </View>
         </Modal>
+
       </View>
     </Modal>
   );
@@ -351,7 +363,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -392,7 +403,6 @@ const styles = StyleSheet.create({
   imagePlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#333333',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -415,8 +425,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#333333',
   },
   boardSelectorLabel: {
     color: '#666666',
@@ -443,6 +451,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  boardCardDark: {
+    backgroundColor: '#333',
   },
   selectedBoard: {
     borderColor: '#E60023',

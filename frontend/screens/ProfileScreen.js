@@ -26,6 +26,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { dummyPins } from '../data/dummyData';
 import config from '../config';
+import { useSettings } from '../context/SettingsContext';
 
 const { width } = Dimensions.get('window');
 const numColumns = 3;
@@ -43,6 +44,9 @@ const ProfileScreen = () => {
   const [selectedView, setSelectedView] = useState('pins'); // 'pins' or 'boards'
   const [userPins, setUserPins] = useState([]);
   const [userBoards, setUserBoards] = useState([]);
+  const { settings } = useSettings();
+  const { darkMode } = settings;
+  console.log('darkMode:', darkMode); // Added console log
 
   const fetchUserProfile = async () => {
     try {
@@ -52,12 +56,14 @@ const ProfileScreen = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        cache: 'no-store',
       });
       if (!response.ok) {
         throw new Error('Failed to fetch user profile');
       }
       const userData = await response.json();
       setUser(userData);
+      console.log('User state updated:', userData); // Added console log
       // If your backend returns pins/boards, set them here. Otherwise, fetch separately if needed.
       // setUserPins(userData.pins || []);
       // setUserBoards(userData.boards || []);
@@ -69,14 +75,15 @@ const ProfileScreen = () => {
     }
   };
 
-
   useEffect(() => {
     fetchUserProfile();
     const unsubscribe = navigation.addListener('refreshProfile', () => {
-      fetchUserProfile();
+      if (route.params?.refresh) {
+        fetchUserProfile();
+      }
     });
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, route.params]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -118,11 +125,15 @@ const ProfileScreen = () => {
         resizeMode="cover"
       />
       <View style={styles.boardInfo}>
-        <Text variant="titleMedium" style={{ color: '#FFFFFF' }}>
-          {board.name}
+        <Text>
+          <Text variant="titleMedium" style={{ color: '#FFFFFF' }}>
+            {board.name}
+          </Text>
         </Text>
-        <Text variant="bodySmall" style={{ color: '#B0B0B0' }}>
-          {board.pins.length} pins
+        <Text>
+          <Text variant="bodySmall" style={{ color: '#B0B0B0' }}>
+            {board.pins.length} pins
+          </Text>
         </Text>
       </View>
     </TouchableOpacity>
@@ -130,14 +141,14 @@ const ProfileScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: '#121212' }]}>
+      <View style={[styles.loadingContainer, { backgroundColor: darkMode ? '#333' : '#fff' }]}>
         <ActivityIndicator size="large" color="#9C27B0" />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: darkMode ? '#333' : '#F7F7F7' }]}>
       <ScrollView
         style={styles.scrollView}
         refreshControl={
@@ -326,7 +337,6 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
   },
   scrollView: {
     flex: 1,
@@ -459,4 +469,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen; 
+export default ProfileScreen;

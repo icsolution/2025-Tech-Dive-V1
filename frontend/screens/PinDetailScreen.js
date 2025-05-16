@@ -36,6 +36,7 @@ import {
   isPinSavedByUser,
   getUserById,
 } from '../data/dummyData';
+import { useSettings } from '../context/SettingsContext';
 
 const { width } = Dimensions.get('window');
 
@@ -54,6 +55,8 @@ const PinDetailScreen = () => {
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
   const currentUser = getCurrentUser();
+  const { settings } = useSettings();
+  const { darkMode } = settings;
 
   const fetchPinDetails = async () => {
     try {
@@ -163,7 +166,7 @@ const PinDetailScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: '#121212' }]}>
+      <View style={[styles.loadingContainer, { backgroundColor: darkMode ? '#333' : '#fff' }]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
@@ -171,15 +174,15 @@ const PinDetailScreen = () => {
 
   if (!pin) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: '#121212' }]}>
-        <Text style={{ color: '#FFFFFF' }}>No pin found</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: darkMode ? '#333' : '#fff' }]}>
+        <Text style={{ color: darkMode ? '#fff' : '#000' }}>No pin found</Text>
       </View>
     );
   }
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: '#121212' }]}
+      style={[styles.container, { backgroundColor: darkMode ? '#333' : '#fff' }]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -190,46 +193,46 @@ const PinDetailScreen = () => {
         resizeMode="cover"
       />
 
-      <Surface style={[styles.content, { backgroundColor: '#1E1E1E' }]}>
+      <Surface style={[styles.content, { backgroundColor: darkMode ? '#444' : '#fff' }]}>
         {/* Header Actions */}
         <View style={styles.headerActions}>
           <IconButton
-            icon={() => <MaterialCommunityIcons name="dots-horizontal" size={24} color="#FFFFFF" />}
+            icon={() => <MaterialCommunityIcons name="dots-horizontal" size={24} color={darkMode ? '#fff' : '#000'} />}
             onPress={() => setMenuVisible(true)}
           />
           <Menu
             visible={menuVisible}
             onDismiss={() => setMenuVisible(false)}
             anchor={<View />}
-            style={{ backgroundColor: '#1E1E1E' }}
+            style={{ backgroundColor: darkMode ? '#333' : '#fff' }}
           >
             <Menu.Item 
               onPress={handleShare} 
               title="Share" 
-              leadingIcon={() => <MaterialCommunityIcons name="share" size={24} color="#FFFFFF" />}
-              titleStyle={{ color: '#FFFFFF' }}
+              leadingIcon={() => <MaterialCommunityIcons name="share" size={24} color={darkMode ? '#fff' : '#000'} />}
+              titleStyle={{ color: darkMode ? '#fff' : '#000' }}
             />
             <Menu.Item 
               onPress={handleCopyLink} 
               title="Copy link" 
-              leadingIcon={() => <MaterialCommunityIcons name="link" size={24} color="#FFFFFF" />}
-              titleStyle={{ color: '#FFFFFF' }}
+              leadingIcon={() => <MaterialCommunityIcons name="link" size={24} color={darkMode ? '#fff' : '#000'} />}
+              titleStyle={{ color: darkMode ? '#fff' : '#000' }}
             />
             <Menu.Item 
               onPress={handleReport} 
               title="Report" 
-              leadingIcon={() => <MaterialCommunityIcons name="flag" size={24} color="#FFFFFF" />}
-              titleStyle={{ color: '#FFFFFF' }}
+              leadingIcon={() => <MaterialCommunityIcons name="flag" size={24} color={darkMode ? '#fff' : '#000'} />}
+              titleStyle={{ color: darkMode ? '#fff' : '#000' }}
             />
           </Menu>
         </View>
 
         {/* Title and Description */}
         <View style={styles.header}>
-          <Text variant="headlineSmall" style={[styles.title, { color: '#FFFFFF' }]}>
+          <Text variant="headlineSmall" style={[styles.title, { color: darkMode ? '#fff' : '#000' }]}>
             {pin.title}
           </Text>
-          <Text variant="bodyLarge" style={[styles.description, { color: '#B0B0B0' }]}>
+          <Text variant="bodyLarge" style={[styles.description, { color: darkMode ? '#ccc' : '#666' }]}>
             {pin.description}
           </Text>
         </View>
@@ -244,16 +247,16 @@ const PinDetailScreen = () => {
             size={40}
           />
           <View style={styles.authorInfo}>
-            <Text variant="titleMedium" style={{ color: '#FFFFFF' }}>
+            <Text variant="titleMedium" style={{ color: darkMode ? '#fff' : '#000' }}>
               {pin.author.username}
             </Text>
-            <Text variant="bodyMedium" style={{ color: '#B0B0B0' }}>
+            <Text variant="bodyMedium" style={{ color: darkMode ? '#ccc' : '#666' }}>
               {pin.author.bio}
             </Text>
           </View>
         </TouchableOpacity>
 
-        <Divider style={[styles.divider, { backgroundColor: '#333333' }]} />
+        <Divider style={[styles.divider, { backgroundColor: darkMode ? '#555' : '#ddd' }]} />
 
         {/* Board Info */}
         <TouchableOpacity
@@ -265,24 +268,24 @@ const PinDetailScreen = () => {
             style={styles.boardThumbnail}
           />
           <View style={styles.boardInfo}>
-            <Text variant="titleMedium" style={{ color: '#FFFFFF' }}>
+            <Text variant="titleMedium" style={{ color: darkMode ? '#fff' : '#000' }}>
               {pin.board.name}
             </Text>
-            <Text variant="bodyMedium" style={{ color: '#B0B0B0' }}>
+            <Text variant="bodyMedium" style={{ color: darkMode ? '#ccc' : '#666' }}>
               {pin.board.description}
             </Text>
           </View>
         </TouchableOpacity>
 
-        <Divider style={[styles.divider, { backgroundColor: '#333333' }]} />
+        <Divider style={[styles.divider, { backgroundColor: darkMode ? '#555' : '#ddd' }]} />
 
         {/* Tags */}
         <View style={styles.tagsContainer}>
           {pin.tags.map((tag, index) => (
             <Chip
               key={index}
-              style={[styles.tag, { backgroundColor: '#333333' }]}
-              textStyle={{ color: '#FFFFFF' }}
+              style={[styles.tag, { backgroundColor: darkMode ? '#555' : '#ddd' }]}
+              textStyle={{ color: darkMode ? '#fff' : '#000' }}
               onPress={() => navigation.navigate('Search', { query: tag })}
             >
               {tag}
@@ -290,27 +293,27 @@ const PinDetailScreen = () => {
           ))}
         </View>
 
-        <Divider style={[styles.divider, { backgroundColor: '#333333' }]} />
+        <Divider style={[styles.divider, { backgroundColor: darkMode ? '#555' : '#ddd' }]} />
 
         {/* Stats and Actions */}
         <View style={styles.statsContainer}>
           <View style={styles.stats}>
-            <Text style={[styles.statCount, { color: '#FFFFFF' }]}>
+            <Text style={[styles.statCount, { color: darkMode ? '#fff' : '#000' }]}>
               {pin.likes.length}
             </Text>
-            <Text style={[styles.statLabel, { color: '#B0B0B0' }]}>likes</Text>
+            <Text style={[styles.statLabel, { color: darkMode ? '#ccc' : '#666' }]}>likes</Text>
           </View>
           <View style={styles.stats}>
-            <Text style={[styles.statCount, { color: '#FFFFFF' }]}>
+            <Text style={[styles.statCount, { color: darkMode ? '#fff' : '#000' }]}>
               {pin.saves.length}
             </Text>
-            <Text style={[styles.statLabel, { color: '#B0B0B0' }]}>saves</Text>
+            <Text style={[styles.statLabel, { color: darkMode ? '#ccc' : '#666' }]}>saves</Text>
           </View>
           <View style={styles.stats}>
-            <Text style={[styles.statCount, { color: '#FFFFFF' }]}>
+            <Text style={[styles.statCount, { color: darkMode ? '#fff' : '#000' }]}>
               {comments.length}
             </Text>
-            <Text style={[styles.statLabel, { color: '#B0B0B0' }]}>comments</Text>
+            <Text style={[styles.statLabel, { color: darkMode ? '#ccc' : '#666' }]}>comments</Text>
           </View>
         </View>
 
@@ -322,15 +325,15 @@ const PinDetailScreen = () => {
             style={[
               styles.actionButton,
               {
-                backgroundColor: isLiked ? '#9C27B0' : 'transparent',
-                borderColor: '#9C27B0'
+                backgroundColor: isLiked ? '#9C27B0' : darkMode ? '#333' : '#fff',
+                borderColor: isLiked ? '#9C27B0' : darkMode ? '#555' : '#ddd'
               }
             ]}
             icon={() => (
               <MaterialCommunityIcons
                 name={isLiked ? "heart" : "heart-outline"}
                 size={24}
-                color={isLiked ? "#FFFFFF" : "#9C27B0"}
+                color={isLiked ? "#FFFFFF" : darkMode ? '#fff' : '#000'}
               />
             )}
           >
@@ -342,15 +345,15 @@ const PinDetailScreen = () => {
             style={[
               styles.actionButton,
               {
-                backgroundColor: isSaved ? '#9C27B0' : 'transparent',
-                borderColor: '#9C27B0'
+                backgroundColor: isSaved ? '#9C27B0' : darkMode ? '#333' : '#fff',
+                borderColor: isSaved ? '#9C27B0' : darkMode ? '#555' : '#ddd'
               }
             ]}
             icon={() => (
               <MaterialCommunityIcons
                 name={isSaved ? "bookmark" : "bookmark-outline"}
                 size={24}
-                color={isSaved ? "#FFFFFF" : "#9C27B0"}
+                color={isSaved ? "#FFFFFF" : darkMode ? '#fff' : '#000'}
               />
             )}
           >
@@ -358,18 +361,18 @@ const PinDetailScreen = () => {
           </Button>
         </View>
 
-        <Divider style={[styles.divider, { backgroundColor: '#333333' }]} />
+        <Divider style={[styles.divider, { backgroundColor: darkMode ? '#555' : '#ddd' }]} />
 
         {/* Comments Section */}
         <View style={styles.commentsSection}>
           <View style={styles.commentHeader}>
-            <Text variant="titleMedium" style={{ color: '#FFFFFF' }}>
+            <Text variant="titleMedium" style={{ color: darkMode ? '#fff' : '#000' }}>
               Comments
             </Text>
             <Button
               mode="text"
               onPress={() => setCommentDialogVisible(true)}
-              textColor="#9C27B0"
+              textColor={darkMode ? '#fff' : '#000'}
             >
               Add Comment
             </Button>
@@ -382,13 +385,13 @@ const PinDetailScreen = () => {
                 size={32}
               />
               <View style={styles.commentContent}>
-                <Text variant="titleSmall" style={{ color: '#FFFFFF' }}>
+                <Text variant="titleSmall" style={{ color: darkMode ? '#fff' : '#000' }}>
                   {comment.author.username}
                 </Text>
-                <Text variant="bodyMedium" style={{ color: '#B0B0B0' }}>
+                <Text variant="bodyMedium" style={{ color: darkMode ? '#ccc' : '#666' }}>
                   {comment.text}
                 </Text>
-                <Text variant="bodySmall" style={{ color: '#666666' }}>
+                <Text variant="bodySmall" style={{ color: darkMode ? '#666' : '#ccc' }}>
                   {new Date(comment.createdAt).toLocaleDateString()}
                 </Text>
               </View>
@@ -402,9 +405,9 @@ const PinDetailScreen = () => {
         <Dialog
           visible={commentDialogVisible}
           onDismiss={() => setCommentDialogVisible(false)}
-          style={{ backgroundColor: '#1E1E1E' }}
+          style={{ backgroundColor: darkMode ? '#333' : '#fff' }}
         >
-          <Dialog.Title style={{ color: '#FFFFFF' }}>Add Comment</Dialog.Title>
+          <Dialog.Title style={{ color: darkMode ? '#fff' : '#000' }}>Add Comment</Dialog.Title>
           <Dialog.Content>
             <TextInput
               value={newComment}
@@ -413,16 +416,16 @@ const PinDetailScreen = () => {
               multiline
               numberOfLines={3}
               placeholder="Write your comment..."
-              style={{ backgroundColor: '#333333' }}
-              textColor="#FFFFFF"
-              placeholderTextColor="#666666"
+              style={{ backgroundColor: darkMode ? '#444' : '#fff' }}
+              textColor={darkMode ? '#fff' : '#000'}
+              placeholderTextColor={darkMode ? '#666' : '#ccc'}
             />
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setCommentDialogVisible(false)} textColor="#9C27B0">
+            <Button onPress={() => setCommentDialogVisible(false)} textColor={darkMode ? '#fff' : '#000'}>
               Cancel
             </Button>
-            <Button onPress={handleAddComment} textColor="#9C27B0">
+            <Button onPress={handleAddComment} textColor={darkMode ? '#fff' : '#000'}>
               Post
             </Button>
           </Dialog.Actions>
@@ -541,4 +544,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PinDetailScreen; 
+export default PinDetailScreen;

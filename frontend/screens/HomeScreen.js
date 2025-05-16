@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
+import { View, FlatList, StyleSheet, Dimensions, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Text, Card, ActivityIndicator, FAB, Searchbar, IconButton, Menu } from 'react-native-paper';
+import { Card, ActivityIndicator, FAB, Searchbar, IconButton, Menu } from 'react-native-paper';
 import { useAuth } from '../context/AuthContext';
 import { pinsAPI } from '../services/api';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { dummyPins } from '../data/dummyData';
+import { useSettings } from '../context/SettingsContext';
 
 const { width } = Dimensions.get('window');
 const numColumns = 2;
@@ -19,6 +20,8 @@ const HomeScreen = () => {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [menuVisible, setMenuVisible] = useState(false);
+  const { settings } = useSettings();
+  const { darkMode } = settings;
 
   const fetchPins = async () => {
     try {
@@ -109,13 +112,10 @@ const HomeScreen = () => {
           console.log('Failed URL:', item.imageUrl);
         }}
       />
-      <Card.Title
-        title={item.title}
-        subtitle={item.description}
-        titleNumberOfLines={2}
-        subtitleNumberOfLines={2}
-        style={styles.pinTitle}
-      />
+      <View style={styles.pinTitle}>
+        <Text numberOfLines={2} style={{ fontSize: 16, fontWeight: 'bold' }}>{item.title}</Text>
+        <Text numberOfLines={2} style={{ fontSize: 14, color: '#666' }}>{item.description}</Text>
+      </View>
     </Card>
   );
 
@@ -136,9 +136,12 @@ const HomeScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
- 
+    <View style={[styles.container,
+      {
+        backgroundColor: darkMode ? '#333' : '#fff',
+      }]}>
+      <View style={[styles.header, darkMode && styles.headerDarkMode]}>
+
         <View>
           <Menu
             visible={menuVisible}
@@ -228,19 +231,20 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8, 
     paddingHorizontal: 8, 
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
     position: 'relative',
     zIndex: 10, 
     elevation: 4, 
+  },
+  headerDarkMode: {
+    backgroundColor: '#333',
   },
   menu: {
     elevation: 10,

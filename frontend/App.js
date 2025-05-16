@@ -54,15 +54,16 @@ function MainApp() {
     <PaperProvider theme={theme}>
       <NavigationContainer theme={theme}>
         <StatusBar style={settings.darkMode ? 'light' : 'dark'} />
-         <View style={styles.container}>
-           <AppNavigator />
-         </View>
-        </NavigationContainer>
-      </PaperProvider>
-    );
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+          <AppNavigator />
+        </View>
+      </NavigationContainer>
+    </PaperProvider>
+  );
 }
 
 export default function App() {
+  console.log('App component initialized');
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
   useEffect(() => {

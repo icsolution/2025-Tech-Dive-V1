@@ -82,6 +82,7 @@ const fetchUserProfile = async () => {
 
     try {
       const token = await AsyncStorage.getItem('token');
+      console.log('FormData before sending request:', formData);
       const response = await fetch(`${config.API_URL}/auth/me`, {
         method: 'PUT',
         headers: {
@@ -92,10 +93,12 @@ const fetchUserProfile = async () => {
       });
 
       const data = await response.json();
+      console.log('API Response:', data); // Added console log to track API response
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update profile');
       }
 
+      navigation.setParams({ refresh: true });
       navigation.goBack();
     } catch (error) {
       setError(error.message);
