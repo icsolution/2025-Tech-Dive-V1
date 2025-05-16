@@ -24,14 +24,11 @@ const TrendingScreen = () => {
   const fetchTrendingItems = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch(
-        `http://localhost:3000/api/pins/trending?timeRange=${timeRange}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${config.API_URL}:5000/pins/trending?timeRange=${timeRange}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch trending items');

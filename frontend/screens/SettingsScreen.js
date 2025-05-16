@@ -24,10 +24,17 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSettings } from '../context/SettingsContext';
 
+
 const SettingsScreen = () => {
   const navigation = useNavigation();
   const theme = useTheme();
   const { settings, updateSetting, updateNestedSetting, resetSettings } = useSettings();
+  
+  // Function to toggle theme
+  const toggleTheme = async (value) => {
+    // Update the setting
+    await updateSetting('darkMode', value);
+  };
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showGridSizeMenu, setShowGridSizeMenu] = useState(false);
@@ -49,8 +56,8 @@ const SettingsScreen = () => {
   };
 
   const renderSection = (title, children) => (
-    <Surface style={styles.sectionContainer} elevation={1}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+    <Surface style={[styles.sectionContainer, { backgroundColor: theme.colors.surface }]} elevation={1}>
+      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{title}</Text>
       {children}
     </Surface>
   );
@@ -59,7 +66,11 @@ const SettingsScreen = () => {
     <List.Item
       title={title}
       description={description}
-      left={props => <List.Icon {...props} icon={icon} color={theme.colors.primary} />}
+      left={props => (
+  typeof icon === 'function'
+    ? icon(props)
+    : <MaterialCommunityIcons name={icon} size={props.size ?? 24} color={theme.colors.primary} />
+) }
       right={right}
       onPress={onPress}
       style={styles.listItem}
@@ -69,8 +80,8 @@ const SettingsScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Surface style={styles.header} elevation={4}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Surface style={[styles.header, { backgroundColor: theme.colors.primary }]} elevation={4}>
         <IconButton
           icon="arrow-left"
           size={24}
@@ -86,22 +97,23 @@ const SettingsScreen = () => {
           <>
             {renderMenuItem({
               title: "Dark Mode",
-              description: "Toggle dark/light theme",
-              icon: "theme-light-dark",
+              description: "Enable dark theme",
+              icon: props => <MaterialCommunityIcons name="theme-light-dark" size={props.size ?? 24} color={theme.colors.primary} />,
               right: () => (
                 <Switch
                   value={settings.darkMode}
-                  onValueChange={(value) => updateSetting('darkMode', value)}
+                  onValueChange={toggleTheme}
                   color={theme.colors.primary}
                   trackColor={{ false: '#767577', true: theme.colors.primary + '80' }}
                   thumbColor={settings.darkMode ? theme.colors.primary : '#f4f3f4'}
                 />
               ),
             })}
+
             {renderMenuItem({
               title: "Grid Size",
               description: "Adjust pin grid size",
-              icon: "view-grid",
+              icon: props => <MaterialCommunityIcons name="view-grid" size={props.size ?? 24} color={theme.colors.primary} />,
               right: props => (
                 <Menu
                   visible={showGridSizeMenu}
@@ -121,7 +133,7 @@ const SettingsScreen = () => {
                       setShowGridSizeMenu(false);
                     }}
                     title="Small"
-                    leadingIcon="grid"
+                    leadingIcon={({ size, color }) => <MaterialCommunityIcons name="grid" size={size} color={color} /> }
                     disabled={settings.gridSize === 'small'}
                   />
                   <Menu.Item
@@ -130,7 +142,7 @@ const SettingsScreen = () => {
                       setShowGridSizeMenu(false);
                     }}
                     title="Medium"
-                    leadingIcon="grid"
+                    leadingIcon={({ size, color }) => <MaterialCommunityIcons name="grid" size={size} color={color} /> }
                     disabled={settings.gridSize === 'medium'}
                   />
                   <Menu.Item
@@ -139,7 +151,7 @@ const SettingsScreen = () => {
                       setShowGridSizeMenu(false);
                     }}
                     title="Large"
-                    leadingIcon="grid"
+                    leadingIcon={({ size, color }) => <MaterialCommunityIcons name="grid" size={size} color={color} /> }
                     disabled={settings.gridSize === 'large'}
                   />
                 </Menu>
@@ -153,7 +165,7 @@ const SettingsScreen = () => {
             {renderMenuItem({
               title: "Push Notifications",
               description: "Receive push notifications",
-              icon: "bell-ring-outline",
+              icon: props => <MaterialCommunityIcons name="bell-ring-outline" size={props.size ?? 24} color={theme.colors.primary} />,
               right: () => (
                 <Switch
                   value={settings.notifications}
@@ -167,7 +179,7 @@ const SettingsScreen = () => {
             {renderMenuItem({
               title: "Email Notifications",
               description: "Receive email updates",
-              icon: "email-outline",
+              icon: props => <MaterialCommunityIcons name="email-outline" size={props.size ?? 24} color={theme.colors.primary} />,
               right: () => (
                 <Switch
                   value={settings.emailNotifications}
@@ -186,15 +198,19 @@ const SettingsScreen = () => {
             {renderMenuItem({
               title: "Edit Profile",
               description: "Change your profile information",
-              icon: "account-edit-outline",
-              right: props => <List.Icon {...props} icon="chevron-right" color={theme.colors.primary} />,
+              icon: props => <MaterialCommunityIcons name="account-edit-outline" size={props.size ?? 24} color={theme.colors.primary} />,
+              right: props => (
+  <MaterialCommunityIcons name="chevron-right" size={props.size ?? 24} color={theme.colors.primary} />
+),
               onPress: () => navigation.navigate('EditProfile'),
             })}
             {renderMenuItem({
               title: "Change Password",
               description: "Update your password",
-              icon: "lock-reset",
-              right: props => <List.Icon {...props} icon="chevron-right" color={theme.colors.primary} />,
+              icon: props => <MaterialCommunityIcons name="lock-reset" size={props.size ?? 24} color={theme.colors.primary} />,
+              right: props => (
+  <MaterialCommunityIcons name="chevron-right" size={props.size ?? 24} color={theme.colors.primary} />
+),
               onPress: () => {},
             })}
           </>
@@ -205,7 +221,7 @@ const SettingsScreen = () => {
             {renderMenuItem({
               title: "Profile Visibility",
               description: "Control who can see your profile",
-              icon: "eye-outline",
+              icon: props => <MaterialCommunityIcons name="eye-outline" size={props.size ?? 24} color={theme.colors.primary} />,
               right: props => (
                 <Menu
                   visible={showPrivacyMenu}
@@ -357,21 +373,27 @@ const SettingsScreen = () => {
               title: "Help Center",
               description: "Get help and support",
               icon: "help-circle-outline",
-              right: props => <List.Icon {...props} icon="chevron-right" color={theme.colors.primary} />,
+              right: props => (
+  <MaterialCommunityIcons name="chevron-right" size={props.size ?? 24} color={theme.colors.primary} />
+),
               onPress: () => {},
             })}
             {renderMenuItem({
               title: "Terms of Service",
               description: "Read our terms of service",
               icon: "file-document-outline",
-              right: props => <List.Icon {...props} icon="chevron-right" color={theme.colors.primary} />,
+              right: props => (
+  <MaterialCommunityIcons name="chevron-right" size={props.size ?? 24} color={theme.colors.primary} />
+),
               onPress: () => {},
             })}
             {renderMenuItem({
               title: "Reset Settings",
               description: "Reset all settings to default",
               icon: "refresh",
-              right: props => <List.Icon {...props} icon="chevron-right" color={theme.colors.primary} />,
+              right: props => (
+  <MaterialCommunityIcons name="chevron-right" size={props.size ?? 24} color={theme.colors.primary} />
+),
               onPress: () => setShowResetDialog(true),
             })}
           </>
@@ -422,7 +444,6 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     flexDirection: 'row',

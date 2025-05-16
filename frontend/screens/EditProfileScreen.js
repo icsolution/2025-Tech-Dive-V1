@@ -1,3 +1,4 @@
+import config from '../config';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -27,10 +28,11 @@ const EditProfileScreen = () => {
     fetchUserProfile();
   }, []);
 
-  const fetchUserProfile = async () => {
+
+const fetchUserProfile = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/users/me', {
+      const response = await fetch(`${config.API_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -80,7 +82,7 @@ const EditProfileScreen = () => {
 
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/users/me', {
+      const response = await fetch(`${config.API_URL}/auth/me`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

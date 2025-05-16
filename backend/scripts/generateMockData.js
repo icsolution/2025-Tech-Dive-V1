@@ -84,7 +84,7 @@ const generateMockData = async () => {
     const users = await Promise.all([
       User.create({
         email: 'john.smith@example.com',
-        password: await bcrypt.hash('Password123!', 10),
+        password: 'Password123!',
         name: 'John Smith',
         username: 'johnsmith',
         title: 'Professional Photographer',
@@ -94,7 +94,7 @@ const generateMockData = async () => {
       }),
       User.create({
         email: 'sarah.j@example.com',
-        password: await bcrypt.hash('Password123!', 10),
+        password: 'Password123!',
         name: 'Sarah Johnson',
         username: 'sarahj',
         title: 'Interior Designer',
@@ -104,7 +104,7 @@ const generateMockData = async () => {
       }),
       User.create({
         email: 'michael.chen@example.com',
-        password: await bcrypt.hash('Password123!', 10),
+        password: 'Password123!',
         name: 'Michael Chen',
         username: 'michaelchen',
         title: 'Tech Entrepreneur',
@@ -114,7 +114,7 @@ const generateMockData = async () => {
       }),
       User.create({
         email: 'emma.w@example.com',
-        password: await bcrypt.hash('Password123!', 10),
+        password: 'Password123!',
         name: 'Emma Wilson',
         username: 'emmaw',
         title: 'Food Blogger',
@@ -124,7 +124,7 @@ const generateMockData = async () => {
       }),
       User.create({
         email: 'david.brown@example.com',
-        password: await bcrypt.hash('Password123!', 10),
+        password: 'Password123!',
         name: 'David Brown',
         username: 'davidbrown',
         title: 'Travel Writer',

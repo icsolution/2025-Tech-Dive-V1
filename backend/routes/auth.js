@@ -16,15 +16,11 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create user
+    // Create user (let pre-save hook hash the password)
     user = new User({
       username,
       email,
-      password: hashedPassword,
+      password, // pass raw password
     });
 
     await user.save();
@@ -62,13 +58,21 @@ router.post('/login', async (req, res) => {
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      console.log('User not found:', email);
+      return res.status(400).json({ message: 'User not found' });
     }
+
+    console.log('Found user:', user.username, 'with email:', user.email);
+    console.log('Stored password hash:', user.password);
+    console.log('Attempting to match with password:', password);
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('Password match result:', isMatch);
+    
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      console.log('Password does not match');
+      return res.status(400).json({ message: 'Invalid password' });
     }
 
     // Create token
@@ -110,6 +114,40 @@ router.get('/me', async (req, res) => {
   } catch (error) {
     console.error('Get current user error:', error);
     res.status(401).json({ message: 'Token is not valid' });
+  }
+});
+
+// Update current user profile
+router.put('/me', async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '') || req.header('x-auth-token');
+    if (!token) {
+      return res.status(401).json({ message: 'No token, authorization denied' });
+    }
+
+    const decoded = jwt.verify(token, config.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update allowed fields
+    if (req.body.username) user.username = req.body.username;
+    if (req.body.email) user.email = req.body.email;
+    if (req.body.bio) user.bio = req.body.bio;
+    if (req.body.avatar) user.avatar = req.body.avatar;
+    await user.save();
+
+    res.json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      bio: user.bio,
+      avatar: user.avatar,
+    });
+  } catch (error) {
+    console.error('Update current user error:', error);
+    res.status(500).json({ message: error.message });
   }
 });
 

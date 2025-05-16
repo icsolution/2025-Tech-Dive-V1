@@ -116,35 +116,48 @@ const UserSchema = new mongoose.Schema({
   }
 });
 
-// Hash password before saving
+// Combined pre-save hook for both password hashing and activity score
 UserSchema.pre('save', async function(next) {
+  // 1. Hash password if modified
   if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
+    try {
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+      console.log('Password hashed successfully');
+    } catch (error) {
+      console.error('Error hashing password:', error);
+      return next(error);
+    }
   }
-  this.updatedAt = new Date();
-  next();
-});
-
-// Method to compare password
-UserSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
-
-// Update activity score before saving
-UserSchema.pre('save', function(next) {
+  
+  // 2. Update activity score
   this.activityScore = (this.totalPinsCreated * 0.3) + 
                       (this.totalComments * 0.2) + 
                       (this.totalBoards * 0.2) + 
                       (this.followers.length * 0.3);
   
-  // Update user segment based on activity score
+  // 3. Update user segment based on activity score
   if (this.activityScore > 80) this.segment = 'influencer';
   else if (this.activityScore > 50) this.segment = 'creator';
   else if (this.activityScore > 20) this.segment = 'power';
   else this.segment = 'casual';
   
+  // 4. Update the timestamp
   this.updatedAt = new Date();
+  
   next();
 });
 
-module.exports = mongoose.model('User', UserSchema); 
+// Method to compare password
+UserSchema.methods.comparePassword = async function(candidatePassword) {
+  try {
+    const isMatch = await bcrypt.compare(candidatePassword, this.password);
+    console.log('Password comparison result:', isMatch);
+    return isMatch;
+  } catch (error) {
+    console.error('Error comparing passwords:', error);
+    throw error;
+  }
+};
+
+module.exports = mongoose.model('User', UserSchema);

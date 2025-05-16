@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,8 +7,10 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import { TextInput, Button, Text, Surface } from 'react-native-paper';
+import { TextInput, Button, Text, Surface, useTheme, Snackbar } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../config';
+import { useAuth } from '../context/AuthContext';
 
 const RegisterScreen = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -19,6 +21,21 @@ const RegisterScreen = ({ navigation }) => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showSnackbar, setShowSnackbar] = useState(false);
+  const theme = useTheme();
+  const { register } = useAuth();
+  
+  // Navigate to login screen after successful registration
+  useEffect(() => {
+    let timer;
+    if (successMessage) {
+      timer = setTimeout(() => {
+        navigation.navigate('Login');
+      }, 2000);
+    }
+    return () => clearTimeout(timer);
+  }, [successMessage, navigation]);
 
   const handleSubmit = async () => {
     setError('');
@@ -31,7 +48,8 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/register', {
+      // Use direct fetch for more control over the registration process
+      const response = await fetch(`${config.API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -46,23 +64,42 @@ const RegisterScreen = ({ navigation }) => {
         throw new Error(data.message || 'Registration failed');
       }
 
-      await AsyncStorage.setItem('token', data.token);
-      navigation.replace('HomeFeed');
+      // Registration successful
+
+      // Show success message instead of immediately navigating
+      setSuccessMessage('Registration successful! Redirecting to login...');
+      setShowSnackbar(true);
+      setError('');
+      
+      // Clear form data
+      setFormData({
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      });
+      
+      // Make sure we're logged out after registration
+      await AsyncStorage.removeItem('token');
     } catch (err) {
       setError(err.message);
+      setSuccessMessage('');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
-      >
-        <Surface style={styles.surface}>
-          <Text variant="headlineMedium" style={styles.title}>Create Account</Text>
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      <Surface style={[styles.surface, { backgroundColor: theme.colors.surface }]}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View>
+            <Text variant="headlineMedium" style={[styles.title, { color: theme.colors.text }]}>Create Account</Text>
+          </View>
+        </TouchableWithoutFeedback>
           
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -71,7 +108,7 @@ const RegisterScreen = ({ navigation }) => {
             label="Username"
             value={formData.username}
             onChangeText={(text) => setFormData({ ...formData, username: text })}
-            style={styles.input}
+            style={[styles.input, { backgroundColor: theme.colors.surfaceVariant }]}
           />
 
           <TextInput
@@ -81,7 +118,7 @@ const RegisterScreen = ({ navigation }) => {
             onChangeText={(text) => setFormData({ ...formData, email: text })}
             keyboardType="email-address"
             autoCapitalize="none"
-            style={styles.input}
+            style={[styles.input, { backgroundColor: theme.colors.surfaceVariant }]}
           />
 
           <TextInput
@@ -90,7 +127,7 @@ const RegisterScreen = ({ navigation }) => {
             value={formData.password}
             onChangeText={(text) => setFormData({ ...formData, password: text })}
             secureTextEntry
-            style={styles.input}
+            style={[styles.input, { backgroundColor: theme.colors.surfaceVariant }]}
           />
 
           <TextInput
@@ -99,41 +136,59 @@ const RegisterScreen = ({ navigation }) => {
             value={formData.confirmPassword}
             onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
             secureTextEntry
-            style={styles.input}
+            style={[styles.input, { backgroundColor: theme.colors.surfaceVariant }]}
           />
 
-          <Button
-            mode="contained"
-            onPress={handleSubmit}
-            loading={loading}
-            style={styles.button}
-          >
-            Register
-          </Button>
+          <View style={styles.buttonContainer}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View>
+                <Button
+                  mode="contained"
+                  onPress={handleSubmit}
+                  loading={loading}
+                  style={styles.button}
+                >
+                  Register
+                </Button>
 
-          <Button
-            mode="text"
-            onPress={() => navigation.navigate('Login')}
-            style={styles.linkButton}
-          >
-            Already have an account? Sign in
-          </Button>
+                <Button
+                  mode="text"
+                  onPress={() => navigation.navigate('Login')}
+                  style={styles.linkButton}
+                >
+                  Already have an account? Sign in
+                </Button>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
         </Surface>
+        
+        {/* Success message snackbar */}
+        <Snackbar
+          visible={showSnackbar && successMessage !== ''}
+          onDismiss={() => setShowSnackbar(false)}
+          duration={2000}
+          style={{ backgroundColor: theme.colors.primary }}
+        >
+          {successMessage}
+        </Snackbar>
       </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   surface: {
     flex: 1,
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  buttonContainer: {
+    width: '100%',
+    marginTop: 16,
   },
   title: {
     marginBottom: 24,

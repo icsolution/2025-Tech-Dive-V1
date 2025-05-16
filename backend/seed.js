@@ -20,7 +20,7 @@ const seedDatabase = async () => {
     await Board.deleteMany({});
 
     // Create test users
-    const password = await bcrypt.hash('password123', 10);
+    const password = 'password123';
     const users = await User.insertMany([
       {
         username: 'john',
@@ -48,18 +48,21 @@ const seedDatabase = async () => {
         title: 'Beautiful Sunset',
         description: 'Captured this amazing sunset at the beach',
         imageUrl: 'https://source.unsplash.com/random/800x600?sunset',
+        category: 'Photography',
         user: users[0]._id,
       },
       {
         title: 'Modern Architecture',
         description: 'Contemporary building design in downtown',
         imageUrl: 'https://source.unsplash.com/random/800x600?architecture',
+        category: 'Architecture',
         user: users[1]._id,
       },
       {
         title: 'Mountain Adventure',
         description: 'Hiking in the Swiss Alps',
         imageUrl: 'https://source.unsplash.com/random/800x600?mountains',
+        category: 'Travel',
         user: users[2]._id,
       },
     ]);

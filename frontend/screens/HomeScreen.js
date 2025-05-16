@@ -4,6 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { Text, Card, ActivityIndicator, FAB, Searchbar, IconButton, Menu } from 'react-native-paper';
 import { useAuth } from '../context/AuthContext';
 import { pinsAPI } from '../services/api';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { dummyPins } from '../data/dummyData';
 
 const { width } = Dimensions.get('window');
 const numColumns = 2;
@@ -21,11 +23,59 @@ const HomeScreen = () => {
   const fetchPins = async () => {
     try {
       setLoading(true);
-      const response = await pinsAPI.getAllPins();
-      setPins(response);
+      // Use dummy data directly for now
+      console.log('Loading dummy pins data');
+
+      // Create a fixed set of pins with complete image URLs
+      const fixedPins = [
+        {
+          _id: 'pin1',
+          title: 'Mountain Adventure',
+          description: 'Hiking in the Swiss Alps',
+          imageUrl: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80',
+          author: { username: 'Sarah Wilson' },
+        },
+        {
+          _id: 'pin2',
+          title: 'Beautiful Sunset',
+          description: 'Captured this amazing sunset at the beach',
+          imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+          author: { username: 'Alex Chen' },
+        },
+        {
+          _id: 'pin3',
+          title: 'Minimalist Living Room',
+          description: 'Clean and serene living space with natural light',
+          imageUrl: 'https://images.unsplash.com/photo-1449247709967-d4461a6a6103?auto=format&fit=crop&w=800&q=80',
+          author: { username: 'Maya Patel' },
+        },
+        {
+          _id: 'pin4',
+          title: 'Urban Photography',
+          description: 'City lights and architecture',
+          imageUrl: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=800&q=80',
+          author: { username: 'Alex Chen' },
+        },
+        {
+          _id: 'pin5',
+          title: 'Healthy Breakfast',
+          description: 'Start your day with nutritious food',
+          imageUrl: 'https://images.unsplash.com/photo-1494390248081-4e521a5940db?auto=format&fit=crop&w=800&q=80',
+          author: { username: 'Sarah Wilson' },
+        },
+        {
+          _id: 'pin6',
+          title: 'Travel Inspiration',
+          description: 'Exploring ancient ruins',
+          imageUrl: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=800&q=80',
+          author: { username: 'Maya Patel' },
+        }
+      ];
+
+      setPins(fixedPins);
       setError(null);
     } catch (err) {
-      console.error('Error fetching pins:', err);
+      console.error('Error setting up pins:', err);
       setError('Failed to load pins');
     } finally {
       setLoading(false);
@@ -50,7 +100,15 @@ const HomeScreen = () => {
       style={styles.pinCard}
       onPress={() => navigation.navigate('PinDetail', { pinId: item._id })}
     >
-      <Card.Cover source={{ uri: item.imageUrl }} style={styles.pinImage} />
+      <Card.Cover
+        source={{ uri: item.imageUrl }}
+        style={styles.pinImage}
+        resizeMode="cover"
+        onError={(e) => {
+          console.error('Image loading error:', e.nativeEvent.error);
+          console.log('Failed URL:', item.imageUrl);
+        }}
+      />
       <Card.Title
         title={item.title}
         subtitle={item.description}
@@ -80,50 +138,70 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+ 
+        <View>
+          <Menu
+            visible={menuVisible}
+            onDismiss={() => setMenuVisible(false)}
+            anchor={
+              <IconButton
+                icon={({ size, color }) => (
+                  <MaterialCommunityIcons name="pinterest" size={size} color={color} />
+                )}
+                size={28}
+                onPress={() => {
+                  console.log("Account IconButton pressed!");
+                  setMenuVisible(true);
+                }}
+                iconColor="#E60023"
+                accessibilityLabel="Open account menu"
+              />
+            }
+          >
+            <Menu.Item
+              onPress={() => {
+                setMenuVisible(false);
+                navigation.navigate('Profile');
+              }}
+              title="Profile"
+              leadingIcon={({ size, color }) => (
+                <MaterialCommunityIcons name="account" size={size} color={color} />
+              )}
+            />
+            {/* IC setting button */}
+            <Menu.Item
+              onPress={() => {
+                setMenuVisible(false);
+                navigation.navigate('Settings');
+              }}
+              title="Settings"
+              leadingIcon={({ size, color }) => (
+                <MaterialCommunityIcons name="cog" size={size} color={color} />
+              )}
+            />
+            <Menu.Item
+              onPress={async () => {
+                setMenuVisible(false);
+                await logout();
+                navigation.replace('Login');
+              }}
+              title="Logout"
+              leadingIcon={({ size, color }) => (
+                <MaterialCommunityIcons name="logout" size={size} color={color} />
+              )}
+            />
+          </Menu>
+        </View>
         <Searchbar
           placeholder="Search pins"
           onChangeText={setSearchQuery}
           value={searchQuery}
-          style={styles.searchBar}
+          style={[styles.searchBar, { flex: 1 }]}
+          icon={({ size, color }) => (
+            <MaterialCommunityIcons name="magnify" size={size} color={color} />
+          )}
           iconColor="#E60023"
         />
-        <Menu
-          visible={menuVisible}
-          onDismiss={() => setMenuVisible(false)}
-          anchor={
-            <IconButton
-              icon="account-circle"
-              size={24}
-              onPress={() => setMenuVisible(true)}
-              iconColor="#E60023"
-            />
-          }
-        >
-          <Menu.Item
-            onPress={() => {
-              setMenuVisible(false);
-              navigation.navigate('Profile');
-            }}
-            title="Profile"
-            leadingIcon="account"
-          />
-          <Menu.Item
-            onPress={() => {
-              setMenuVisible(false);
-              navigation.navigate('Settings');
-            }}
-            title="Settings"
-            leadingIcon="cog"
-          />
-          <Menu.Item
-            onPress={() => {
-              setMenuVisible(false);
-              logout();
-            }}
-            title="Logout"
-            leadingIcon="logout"
-          />
-        </Menu>
       </View>
 
       <FlatList
@@ -135,7 +213,9 @@ const HomeScreen = () => {
         showsVerticalScrollIndicator={false}
       />
       <FAB
-        icon="plus"
+        icon={({ size, color }) => (
+          <MaterialCommunityIcons name="plus" size={size} color={color} />
+        )}
         style={styles.fab}
         onPress={() => navigation.navigate('CreatePin')}
         color="#fff"
@@ -153,17 +233,25 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 8,
+    paddingVertical: 8, 
+    paddingHorizontal: 8, 
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+    position: 'relative',
+    zIndex: 10, 
+    elevation: 4, 
+  },
+  menu: {
+    elevation: 10,
   },
   searchBar: {
-    flex: 1,
-    marginRight: 8,
+    minWidth: 0, 
     backgroundColor: '#f5f5f5',
     elevation: 0,
+    borderRadius: 24,
   },
+
   centered: {
     flex: 1,
     justifyContent: 'center',
@@ -181,6 +269,7 @@ const styles = StyleSheet.create({
   },
   pinImage: {
     height: pinWidth,
+    backgroundColor: '#f0f0f0',  
   },
   pinTitle: {
     padding: 8,

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Text, Surface, ActivityIndicator, FAB } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 const numColumns = 2;
@@ -92,7 +93,9 @@ const SelectBoardScreen = () => {
       />
 
       <FAB
-        icon="plus"
+        icon={({ size, color }) => (
+          <MaterialCommunityIcons name="plus" size={size} color={color} />
+        )}
         style={styles.fab}
         onPress={() => navigation.navigate('CreateBoard')}
       />

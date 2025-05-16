@@ -359,9 +359,11 @@ const BoardScreen = () => {
       </Animated.ScrollView>
 
       <FAB
-        icon="plus"
-        style={[styles.fab, { backgroundColor: '#9C27B0' }]}
-        onPress={() => navigation.navigate('AddPin', { boardId })}
+        icon={({ size, color }) => (
+          <MaterialCommunityIcons name="plus" size={size} color={color} />
+        )}
+        style={styles.fab}
+        onPress={() => navigation.navigate('CreatePin', { boardId })}
       />
 
       <Menu

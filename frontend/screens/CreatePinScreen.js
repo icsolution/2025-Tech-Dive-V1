@@ -162,9 +162,8 @@ const CreatePinScreen = () => {
       // Add the new pin to the board's pins array
       selectedBoard.pins.push(newPin);
       
-      // Navigate back to the previous screen with a refresh parameter
-      navigation.navigate('Home', { refresh: true });
-      navigation.navigate('Profile', { refresh: true });
+      // Navigate back to the previous screen
+      navigation.goBack();
 
       // Close the modal
       setModalVisible(false);
@@ -181,7 +180,10 @@ const CreatePinScreen = () => {
       animationType="slide"
       transparent={true}
       visible={modalVisible}
-      onRequestClose={() => setModalVisible(false)}
+      onRequestClose={() => {
+        setModalVisible(false);
+        navigation.goBack();
+      }}
     >
       <View style={styles.modalContainer}>
         <TouchableOpacity 

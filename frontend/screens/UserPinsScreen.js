@@ -9,12 +9,14 @@ import {
 import { Text, Surface, ActivityIndicator, FAB } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 const numColumns = 2;
 const itemWidth = width / numColumns - 16;
 
 const UserPinsScreen = () => {
+  const theme = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const { userId } = route.params;
@@ -26,7 +28,7 @@ const UserPinsScreen = () => {
   const fetchPins = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/users/${userId}/pins`, {
+      const response = await fetch(`${config.API_URL}/users/${userId}/pins`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -125,7 +127,9 @@ const UserPinsScreen = () => {
 
       {userId === user?._id && (
         <FAB
-          icon="plus"
+          icon={({ size, color }) => (
+            <MaterialCommunityIcons name="plus" size={size} color={color} />
+          )}
           style={styles.fab}
           onPress={() => navigation.navigate('CreatePin')}
         />
