@@ -259,7 +259,7 @@ const originalPins = [
   {
     title: 'Beautiful Sunset in Bali',
     description: 'Captured this amazing sunset during my trip to Bali. The colors were absolutely stunning!',
-    imageUrl: 'https://source.unsplash.com/800x600/?sunset,bali',
+    imageUrl: 'https://images.unsplash.com/photo-1669545192473-f4d88714fe2f?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Travel',
     tags: ['travel', 'sunset', 'bali'],
     boardCategory: 'Travel',
@@ -267,7 +267,7 @@ const originalPins = [
   {
     title: 'Modern Living Room Design',
     description: 'Clean and minimal living room design with neutral colors and natural elements.',
-    imageUrl: 'https://source.unsplash.com/800x600/?living-room,modern',
+    imageUrl: 'https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=800&q=80',
     category: 'Design',
     tags: ['interior', 'modern', 'minimal'],
     boardCategory: 'Design',
@@ -281,7 +281,7 @@ const additionalPins = [
   {
     title: 'Long Exposure Night Photography',
     description: 'Learn how to capture stunning light trails and star trails with these long exposure techniques. Settings: f/2.8, 30sec, ISO 800.',
-    imageUrl: 'https://source.unsplash.com/800x600/?night,photography',
+    imageUrl: 'https://plus.unsplash.com/premium_photo-1664304346239-d11159862500?q=80&w=1949&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Photography',
     tags: ['night photography', 'long exposure', 'tutorial'],
     boardCategory: 'Photography',
@@ -289,7 +289,7 @@ const additionalPins = [
   {
     title: 'Urban Architecture Series',
     description: 'Geometric patterns in modern architecture. Shot in downtown Chicago using a wide-angle lens.',
-    imageUrl: 'https://source.unsplash.com/800x600/?architecture,urban',
+    imageUrl: 'https://images.unsplash.com/photo-1640200640291-9d2a210217d9?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Architecture',
     tags: ['architecture', 'urban', 'geometric'],
     boardCategory: 'Architecture',
@@ -299,7 +299,7 @@ const additionalPins = [
   {
     title: 'Scandinavian Living Room',
     description: 'Minimalist Scandinavian design featuring natural materials and neutral colors. Furniture from IKEA and local artisans.',
-    imageUrl: 'https://source.unsplash.com/800x600/?scandinavian,interior',
+    imageUrl: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Design',
     tags: ['scandinavian', 'minimalist', 'interior design'],
     boardCategory: 'Design',
@@ -307,7 +307,7 @@ const additionalPins = [
   {
     title: 'DIY Floating Shelves',
     description: 'Step-by-step guide to creating custom floating shelves. Materials needed: wood planks, brackets, drill, level.',
-    imageUrl: 'https://source.unsplash.com/800x600/?shelves,diy',
+    imageUrl: 'https://plus.unsplash.com/premium_photo-1682402663900-a4dc2c200933?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Design',
     tags: ['DIY', 'home improvement', 'storage'],
     boardCategory: 'Design',
@@ -317,7 +317,7 @@ const additionalPins = [
   {
     title: 'Homemade Sourdough Bread',
     description: 'Artisanal sourdough bread recipe. 75% hydration, 24-hour fermentation. Ingredients: flour, water, salt, starter.',
-    imageUrl: 'https://source.unsplash.com/800x600/?sourdough,bread',
+    imageUrl: 'https://images.unsplash.com/photo-1745657038804-2087fbf2e789?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Food',
     tags: ['baking', 'sourdough', 'bread'],
     boardCategory: 'Gourmet Recipes',
@@ -325,7 +325,7 @@ const additionalPins = [
   {
     title: 'Knife Skills 101',
     description: 'Essential knife techniques every home chef should know. Includes proper grip, basic cuts, and safety tips.',
-    imageUrl: 'https://source.unsplash.com/800x600/?knife,cooking',
+    imageUrl: 'https://plus.unsplash.com/premium_photo-1668988895574-357b893c2815?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Food',
     tags: ['cooking', 'techniques', 'kitchen'],
     boardCategory: 'Kitchen Tips',
@@ -335,7 +335,7 @@ const additionalPins = [
   {
     title: 'Hidden Gems of Kyoto',
     description: 'Exploring lesser-known temples and gardens in Kyoto, Japan. Best visited during cherry blossom season.',
-    imageUrl: 'https://source.unsplash.com/800x600/?kyoto,temple',
+    imageUrl: 'https://images.unsplash.com/photo-1681862565403-db4b284bb3aa?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Travel',
     tags: ['japan', 'kyoto', 'travel'],
     boardCategory: 'Travel Destinations',
@@ -343,7 +343,7 @@ const additionalPins = [
   {
     title: 'Backpacking Essentials',
     description: 'Complete packing list for long-term travel. Includes gear recommendations and space-saving tips.',
-    imageUrl: 'https://source.unsplash.com/800x600/?backpack,travel',
+    imageUrl: 'https://images.unsplash.com/photo-1710031338984-0c1c28090dd8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Travel',
     tags: ['backpacking', 'travel tips', 'packing'],
     boardCategory: 'Travel Tips',
@@ -353,7 +353,7 @@ const additionalPins = [
   {
     title: 'Smart Home Automation Guide',
     description: 'Comprehensive guide to setting up a smart home system. Compatible with Alexa, Google Home, and HomeKit.',
-    imageUrl: 'https://source.unsplash.com/800x600/?smarthome,technology',
+    imageUrl: 'https://images.unsplash.com/photo-1648737153811-69a6d8c528bf?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Tech',
     tags: ['smart home', 'automation', 'tech'],
     boardCategory: 'Tech',
@@ -361,7 +361,7 @@ const additionalPins = [
   {
     title: 'Latest Smartphone Camera Comparison',
     description: 'Detailed comparison of flagship smartphone cameras. Tests include low-light, portrait, and ultra-wide shots.',
-    imageUrl: 'https://source.unsplash.com/800x600/?smartphone,camera',
+    imageUrl: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Tech',
     tags: ['smartphone', 'camera', 'review'],
     boardCategory: 'Tech',
@@ -374,7 +374,7 @@ const additionalUserPins = [
   {
     title: 'Sustainable Fashion Collection',
     description: 'Eco-friendly fashion pieces made from recycled materials. Each piece tells a story of sustainability.',
-    imageUrl: 'https://source.unsplash.com/800x600/?fashion,sustainable',
+    imageUrl: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Fashion',
     tags: ['sustainable', 'fashion', 'eco-friendly'],
     boardCategory: 'Fashion',
@@ -382,7 +382,7 @@ const additionalUserPins = [
   {
     title: 'Street Style Photography',
     description: 'Capturing urban fashion trends and street style moments. Shot in Paris Fashion Week.',
-    imageUrl: 'https://source.unsplash.com/800x600/?street-style,fashion',
+    imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Fashion',
     tags: ['street style', 'fashion week', 'photography'],
     boardCategory: 'Fashion',
@@ -392,7 +392,7 @@ const additionalUserPins = [
   {
     title: 'Home Workout Routine',
     description: 'Complete 30-minute home workout routine. No equipment needed. Perfect for beginners.',
-    imageUrl: 'https://source.unsplash.com/800x600/?workout,fitness',
+    imageUrl: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Fitness',
     tags: ['workout', 'fitness', 'home exercise'],
     boardCategory: 'Fitness',
@@ -400,7 +400,7 @@ const additionalUserPins = [
   {
     title: 'Healthy Meal Prep Guide',
     description: 'Weekly meal prep guide with balanced nutrition. Includes shopping list and storage tips.',
-    imageUrl: 'https://source.unsplash.com/800x600/?meal-prep,healthy',
+    imageUrl: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Fitness',
     tags: ['meal prep', 'healthy eating', 'nutrition'],
     boardCategory: 'Fitness',
@@ -410,7 +410,7 @@ const additionalUserPins = [
   {
     title: 'Vertical Garden Design',
     description: 'Create a stunning vertical garden with self-watering system. Perfect for small spaces.',
-    imageUrl: 'https://source.unsplash.com/800x600/?garden,vertical',
+    imageUrl: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Gardening',
     tags: ['garden', 'vertical garden', 'plants'],
     boardCategory: 'Gardening',
@@ -418,7 +418,7 @@ const additionalUserPins = [
   {
     title: 'Succulent Arrangement Guide',
     description: 'Learn how to create beautiful succulent arrangements. Includes care instructions.',
-    imageUrl: 'https://source.unsplash.com/800x600/?succulents,garden',
+    imageUrl: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Gardening',
     tags: ['succulents', 'garden', 'arrangement'],
     boardCategory: 'Gardening',
@@ -428,7 +428,7 @@ const additionalUserPins = [
   {
     title: 'Classic Car Photography',
     description: 'Capturing the beauty of vintage automobiles. Tips for automotive photography.',
-    imageUrl: 'https://source.unsplash.com/800x600/?classic-car,automotive',
+    imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Automotive',
     tags: ['classic cars', 'photography', 'automotive'],
     boardCategory: 'Automotive',
@@ -436,7 +436,7 @@ const additionalUserPins = [
   {
     title: 'Car Detailing Guide',
     description: 'Professional car detailing techniques. From washing to waxing, step by step.',
-    imageUrl: 'https://source.unsplash.com/800x600/?car-detailing,automotive',
+    imageUrl: 'https://images.unsplash.com/photo-1743367998418-1c3c1568aa85?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Automotive',
     tags: ['car care', 'detailing', 'automotive'],
     boardCategory: 'Automotive',
@@ -446,7 +446,7 @@ const additionalUserPins = [
   {
     title: 'Remote Work Setup Guide',
     description: 'Essential tools and setup for productive remote work. Includes ergonomic tips.',
-    imageUrl: 'https://source.unsplash.com/800x600/?remote-work,office',
+    imageUrl: 'https://images.unsplash.com/photo-1593642532744-d377ab507dc8?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Digital Nomad',
     tags: ['remote work', 'productivity', 'setup'],
     boardCategory: 'Digital Nomad',
@@ -454,7 +454,7 @@ const additionalUserPins = [
   {
     title: 'Travel Workstation',
     description: 'Portable workstation setup for digital nomads. Lightweight and efficient.',
-    imageUrl: 'https://source.unsplash.com/800x600/?travel,workstation',
+    imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Digital Nomad',
     tags: ['digital nomad', 'travel', 'workstation'],
     boardCategory: 'Digital Nomad',
@@ -464,7 +464,7 @@ const additionalUserPins = [
   {
     title: 'Latte Art Tutorial',
     description: 'Master the art of latte decoration. Basic to advanced patterns.',
-    imageUrl: 'https://source.unsplash.com/800x600/?latte-art,coffee',
+    imageUrl: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Coffee',
     tags: ['coffee', 'latte art', 'tutorial'],
     boardCategory: 'Coffee',
@@ -472,7 +472,7 @@ const additionalUserPins = [
   {
     title: 'Coffee Brewing Methods',
     description: 'Comparison of different coffee brewing methods. Find your perfect cup.',
-    imageUrl: 'https://source.unsplash.com/800x600/?coffee-brewing,coffee',
+    imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Coffee',
     tags: ['coffee', 'brewing', 'methods'],
     boardCategory: 'Coffee',
@@ -482,7 +482,7 @@ const additionalUserPins = [
   {
     title: 'Contemporary Art Gallery',
     description: 'Showcase of emerging contemporary artists. Each piece tells a unique story.',
-    imageUrl: 'https://source.unsplash.com/800x600/?art-gallery,contemporary',
+    imageUrl: 'https://images.unsplash.com/photo-1647792845543-a8032c59cbdf?q=80&w=1931&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Art',
     tags: ['art', 'gallery', 'contemporary'],
     boardCategory: 'Art',
@@ -490,7 +490,7 @@ const additionalUserPins = [
   {
     title: 'Art Installation Guide',
     description: 'How to create impactful art installations. From concept to execution.',
-    imageUrl: 'https://source.unsplash.com/800x600/?art-installation,art',
+    imageUrl: 'https://images.unsplash.com/photo-1536924430914-91f9e2041b83?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Art',
     tags: ['art', 'installation', 'guide'],
     boardCategory: 'Art',
@@ -500,7 +500,7 @@ const additionalUserPins = [
   {
     title: 'Home Studio Setup',
     description: 'Professional home music studio setup guide. Equipment recommendations included.',
-    imageUrl: 'https://source.unsplash.com/800x600/?music-studio,studio',
+    imageUrl: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Music',
     tags: ['music', 'studio', 'production'],
     boardCategory: 'Music',
@@ -508,7 +508,7 @@ const additionalUserPins = [
   {
     title: 'DJ Equipment Guide',
     description: 'Essential DJ equipment for beginners. From controllers to speakers.',
-    imageUrl: 'https://source.unsplash.com/800x600/?dj-equipment,music',
+    imageUrl: 'https://images.unsplash.com/photo-1571934811356-5cc061b6821f?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Music',
     tags: ['dj', 'equipment', 'music'],
     boardCategory: 'Music',
@@ -518,7 +518,7 @@ const additionalUserPins = [
   {
     title: 'Morning Yoga Flow',
     description: 'Start your day with this energizing yoga sequence. Perfect for beginners.',
-    imageUrl: 'https://source.unsplash.com/800x600/?yoga,morning',
+    imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Yoga',
     tags: ['yoga', 'morning routine', 'fitness'],
     boardCategory: 'Yoga',
@@ -526,7 +526,7 @@ const additionalUserPins = [
   {
     title: 'Meditation Guide',
     description: 'Learn different meditation techniques. From mindfulness to transcendental.',
-    imageUrl: 'https://source.unsplash.com/800x600/?meditation,yoga',
+    imageUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Yoga',
     tags: ['meditation', 'mindfulness', 'wellness'],
     boardCategory: 'Yoga',
@@ -536,7 +536,7 @@ const additionalUserPins = [
   {
     title: 'Sustainable Building Design',
     description: 'Eco-friendly architectural solutions. From materials to energy efficiency.',
-    imageUrl: 'https://source.unsplash.com/800x600/?architecture,sustainable',
+    imageUrl: 'https://images.unsplash.com/photo-1518005068251-37900150dfca?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Architecture',
     tags: ['architecture', 'sustainable', 'design'],
     boardCategory: 'Architecture',
@@ -544,7 +544,7 @@ const additionalUserPins = [
   {
     title: 'Modern Architecture Tour',
     description: 'Virtual tour of iconic modern buildings. Architectural analysis included.',
-    imageUrl: 'https://source.unsplash.com/800x600/?modern-architecture,building',
+    imageUrl: 'https://images.unsplash.com/photo-1470723710355-95304d8aece4?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Architecture',
     tags: ['architecture', 'modern', 'buildings'],
     boardCategory: 'Architecture',
@@ -557,7 +557,7 @@ const morePins = [
   {
     title: 'Macro Photography Tips',
     description: 'Master the art of macro photography. Equipment: Canon 100mm f/2.8L macro lens, ring flash, tripod.',
-    imageUrl: 'https://source.unsplash.com/800x600/?macro,photography',
+    imageUrl: 'https://images.unsplash.com/photo-1625322214522-de1785f663fc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Photography',
     tags: ['macro', 'photography', 'tutorial'],
     boardCategory: 'Photography',
@@ -565,7 +565,7 @@ const morePins = [
   {
     title: 'Portrait Lighting Setup',
     description: 'Professional portrait lighting techniques using natural and artificial light. Includes diagram.',
-    imageUrl: 'https://source.unsplash.com/800x600/?portrait,lighting',
+    imageUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Photography',
     tags: ['portrait', 'lighting', 'photography'],
     boardCategory: 'Photography',
@@ -575,7 +575,7 @@ const morePins = [
   {
     title: 'Artisanal Pizza Making',
     description: 'Authentic Neapolitan pizza recipe. Dough: 00 flour, water, salt, yeast. 72-hour fermentation.',
-    imageUrl: 'https://source.unsplash.com/800x600/?pizza,homemade',
+    imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Food',
     tags: ['pizza', 'baking', 'italian'],
     boardCategory: 'Gourmet Recipes',
@@ -583,7 +583,7 @@ const morePins = [
   {
     title: 'Sushi Rolling Guide',
     description: 'Step-by-step guide to making perfect sushi rolls. Includes rice preparation and rolling techniques.',
-    imageUrl: 'https://source.unsplash.com/800x600/?sushi,rolling',
+    imageUrl: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Food',
     tags: ['sushi', 'japanese', 'cooking'],
     boardCategory: 'Gourmet Recipes',
@@ -593,7 +593,7 @@ const morePins = [
   {
     title: 'Northern Lights Guide',
     description: 'Complete guide to photographing the Northern Lights. Best locations, timing, and camera settings.',
-    imageUrl: 'https://source.unsplash.com/800x600/?aurora,northern-lights',
+    imageUrl: 'https://images.unsplash.com/photo-1483347756197-71ef80e95f73?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Travel',
     tags: ['aurora', 'photography', 'travel'],
     boardCategory: 'Travel Destinations',
@@ -601,7 +601,7 @@ const morePins = [
   {
     title: 'Hidden Beaches of Thailand',
     description: 'Discover secluded beaches and islands in Thailand. Includes local tips and best times to visit.',
-    imageUrl: 'https://source.unsplash.com/800x600/?beach,thailand',
+    imageUrl: 'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Travel',
     tags: ['beach', 'thailand', 'travel'],
     boardCategory: 'Travel Destinations',
@@ -611,7 +611,7 @@ const morePins = [
   {
     title: 'Home Server Setup',
     description: 'Build your own home server for media streaming and file storage. Hardware and software guide.',
-    imageUrl: 'https://source.unsplash.com/800x600/?server,technology',
+    imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Tech',
     tags: ['server', 'tech', 'diy'],
     boardCategory: 'Tech',
@@ -619,7 +619,7 @@ const morePins = [
   {
     title: 'Smart Watch Comparison',
     description: 'Detailed comparison of latest smartwatches. Battery life, features, and compatibility analysis.',
-    imageUrl: 'https://source.unsplash.com/800x600/?smartwatch,tech',
+    imageUrl: 'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Tech',
     tags: ['smartwatch', 'tech', 'review'],
     boardCategory: 'Tech',
@@ -629,7 +629,7 @@ const morePins = [
   {
     title: 'Vintage Fashion Collection',
     description: 'Curated collection of vintage fashion pieces. Includes styling tips and care instructions.',
-    imageUrl: 'https://source.unsplash.com/800x600/?vintage,fashion',
+    imageUrl: 'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Fashion',
     tags: ['vintage', 'fashion', 'style'],
     boardCategory: 'Fashion',
@@ -637,7 +637,7 @@ const morePins = [
   {
     title: 'Sustainable Fabric Guide',
     description: 'Guide to eco-friendly fabrics and materials. Impact on environment and care instructions.',
-    imageUrl: 'https://source.unsplash.com/800x600/?fabric,sustainable',
+    imageUrl: 'https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Fashion',
     tags: ['sustainable', 'fabric', 'fashion'],
     boardCategory: 'Fashion',
@@ -647,7 +647,7 @@ const morePins = [
   {
     title: 'HIIT Workout Guide',
     description: 'High-intensity interval training routine. 30-minute workout with proper form demonstrations.',
-    imageUrl: 'https://source.unsplash.com/800x600/?workout,hiit',
+    imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Fitness',
     tags: ['hiit', 'workout', 'fitness'],
     boardCategory: 'Fitness',
@@ -655,7 +655,7 @@ const morePins = [
   {
     title: 'Protein Smoothie Recipes',
     description: 'Healthy protein smoothie recipes for post-workout recovery. Includes nutritional information.',
-    imageUrl: 'https://source.unsplash.com/800x600/?smoothie,healthy',
+    imageUrl: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Fitness',
     tags: ['smoothie', 'protein', 'healthy'],
     boardCategory: 'Fitness',
@@ -665,7 +665,7 @@ const morePins = [
   {
     title: 'Herb Garden Guide',
     description: 'Create and maintain a kitchen herb garden. Includes plant selection and care tips.',
-    imageUrl: 'https://source.unsplash.com/800x600/?herbs,garden',
+    imageUrl: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Gardening',
     tags: ['herbs', 'garden', 'cooking'],
     boardCategory: 'Gardening',
@@ -673,7 +673,7 @@ const morePins = [
   {
     title: 'Composting Guide',
     description: 'Learn how to create nutrient-rich compost. Step-by-step guide with troubleshooting tips.',
-    imageUrl: 'https://source.unsplash.com/800x600/?compost,garden',
+    imageUrl: 'https://plus.unsplash.com/premium_photo-1742420854807-505e50053615?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Gardening',
     tags: ['compost', 'garden', 'sustainable'],
     boardCategory: 'Gardening',
@@ -683,7 +683,7 @@ const morePins = [
   {
     title: 'Electric Vehicle Guide',
     description: 'Complete guide to electric vehicles. Charging, maintenance, and cost comparison.',
-    imageUrl: 'https://source.unsplash.com/800x600/?electric-car,automotive',
+    imageUrl: 'https://images.unsplash.com/photo-1726220270971-d6317d9ba4cc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Automotive',
     tags: ['ev', 'automotive', 'sustainable'],
     boardCategory: 'Automotive',
@@ -691,7 +691,7 @@ const morePins = [
   {
     title: 'Car Photography Tips',
     description: 'Professional car photography techniques. Lighting, angles, and post-processing guide.',
-    imageUrl: 'https://source.unsplash.com/800x600/?car-photography,automotive',
+    imageUrl: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Automotive',
     tags: ['photography', 'cars', 'automotive'],
     boardCategory: 'Automotive',
@@ -701,7 +701,7 @@ const morePins = [
   {
     title: 'Digital Nomad Tools',
     description: 'Essential tools and apps for digital nomads. Productivity, communication, and travel apps.',
-    imageUrl: 'https://source.unsplash.com/800x600/?digital-nomad,tools',
+    imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Digital Nomad',
     tags: ['digital nomad', 'tools', 'productivity'],
     boardCategory: 'Digital Nomad',
@@ -709,7 +709,7 @@ const morePins = [
   {
     title: 'Remote Work Communication',
     description: 'Effective communication strategies for remote teams. Tools and best practices.',
-    imageUrl: 'https://source.unsplash.com/800x600/?remote-work,communication',
+    imageUrl: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Digital Nomad',
     tags: ['remote work', 'communication', 'team'],
     boardCategory: 'Digital Nomad',
@@ -719,7 +719,7 @@ const morePins = [
   {
     title: 'Coffee Bean Guide',
     description: 'Understanding different coffee beans and roasts. Origin, flavor profiles, and brewing tips.',
-    imageUrl: 'https://source.unsplash.com/800x600/?coffee-beans,coffee',
+    imageUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Coffee',
     tags: ['coffee', 'beans', 'brewing'],
     boardCategory: 'Coffee',
@@ -727,7 +727,7 @@ const morePins = [
   {
     title: 'Coffee Shop Design',
     description: 'Design inspiration for coffee shops. Layout, lighting, and atmosphere tips.',
-    imageUrl: 'https://source.unsplash.com/800x600/?coffee-shop,design',
+    imageUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Coffee',
     tags: ['coffee shop', 'design', 'interior'],
     boardCategory: 'Coffee',
@@ -737,7 +737,7 @@ const morePins = [
   {
     title: 'Digital Art Tools',
     description: 'Essential tools and software for digital artists. Hardware and software recommendations.',
-    imageUrl: 'https://source.unsplash.com/800x600/?digital-art,tools',
+    imageUrl: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Art',
     tags: ['digital art', 'tools', 'software'],
     boardCategory: 'Art',
@@ -745,7 +745,7 @@ const morePins = [
   {
     title: 'Color Theory Guide',
     description: 'Understanding color theory for artists. Color wheel, harmonies, and psychology.',
-    imageUrl: 'https://source.unsplash.com/800x600/?color-theory,art',
+    imageUrl: 'https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Art',
     tags: ['color theory', 'art', 'design'],
     boardCategory: 'Art',
@@ -755,7 +755,7 @@ const morePins = [
   {
     title: 'Music Production Guide',
     description: 'Beginner\'s guide to music production. DAW setup, plugins, and basic techniques.',
-    imageUrl: 'https://source.unsplash.com/800x600/?music-production,studio',
+    imageUrl: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Music',
     tags: ['music', 'production', 'studio'],
     boardCategory: 'Music',
@@ -763,7 +763,7 @@ const morePins = [
   {
     title: 'Live Sound Setup',
     description: 'Professional live sound setup guide. Equipment, mixing, and troubleshooting.',
-    imageUrl: 'https://source.unsplash.com/800x600/?live-sound,music',
+    imageUrl: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Music',
     tags: ['live sound', 'music', 'audio'],
     boardCategory: 'Music',
@@ -773,7 +773,7 @@ const morePins = [
   {
     title: 'Advanced Yoga Poses',
     description: 'Guide to advanced yoga poses. Safety tips and progression techniques.',
-    imageUrl: 'https://source.unsplash.com/800x600/?yoga,advanced',
+    imageUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Yoga',
     tags: ['yoga', 'poses', 'advanced'],
     boardCategory: 'Yoga',
@@ -781,7 +781,7 @@ const morePins = [
   {
     title: 'Yoga for Athletes',
     description: 'Yoga sequences designed for athletes. Focus on flexibility and recovery.',
-    imageUrl: 'https://source.unsplash.com/800x600/?yoga,athletes',
+    imageUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Yoga',
     tags: ['yoga', 'athletes', 'fitness'],
     boardCategory: 'Yoga',
@@ -791,7 +791,7 @@ const morePins = [
   {
     title: 'Green Building Design',
     description: 'Sustainable building design principles. Materials, energy efficiency, and certifications.',
-    imageUrl: 'https://source.unsplash.com/800x600/?green-building,architecture',
+    imageUrl: 'https://images.unsplash.com/photo-1518005068251-37900150dfca?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Architecture',
     tags: ['green building', 'architecture', 'sustainable'],
     boardCategory: 'Architecture',
@@ -799,7 +799,7 @@ const morePins = [
   {
     title: 'Architectural Photography',
     description: 'Techniques for capturing architectural photography. Equipment and composition tips.',
-    imageUrl: 'https://source.unsplash.com/800x600/?architecture,photography',
+    imageUrl: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Architecture',
     tags: ['architecture', 'photography', 'design'],
     boardCategory: 'Architecture',
@@ -809,7 +809,7 @@ const morePins = [
   {
     title: 'Minimalist Design Guide',
     description: 'Principles of minimalist design. Space, light, and material selection.',
-    imageUrl: 'https://source.unsplash.com/800x600/?minimalist,design',
+    imageUrl: 'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Design',
     tags: ['minimalist', 'design', 'interior'],
     boardCategory: 'Design',
@@ -817,7 +817,7 @@ const morePins = [
   {
     title: 'Sustainable Living Tips',
     description: 'Daily sustainable living practices. Reduce, reuse, and recycle guide.',
-    imageUrl: 'https://source.unsplash.com/800x600/?sustainable,living',
+    imageUrl: 'https://images.unsplash.com/photo-1530789253388-582c481c54b0?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Lifestyle',
     tags: ['sustainable', 'lifestyle', 'eco'],
     boardCategory: 'Lifestyle',
@@ -825,7 +825,7 @@ const morePins = [
   {
     title: 'Urban Gardening Guide',
     description: 'Create a garden in small urban spaces. Container and vertical gardening tips.',
-    imageUrl: 'https://source.unsplash.com/800x600/?urban-garden,gardening',
+    imageUrl: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Gardening',
     tags: ['urban garden', 'gardening', 'sustainable'],
     boardCategory: 'Gardening',
@@ -833,7 +833,7 @@ const morePins = [
   {
     title: 'Photography Composition',
     description: 'Master photography composition techniques. Rule of thirds, leading lines, and more.',
-    imageUrl: 'https://source.unsplash.com/800x600/?photography,composition',
+    imageUrl: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Photography',
     tags: ['photography', 'composition', 'tutorial'],
     boardCategory: 'Photography',
@@ -841,7 +841,7 @@ const morePins = [
   {
     title: 'Smart Home Security',
     description: 'Modern home security systems. Cameras, sensors, and automation guide.',
-    imageUrl: 'https://source.unsplash.com/800x600/?security,smarthome',
+    imageUrl: 'https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dfit=crop&q=80',
     category: 'Tech',
     tags: ['security', 'smart home', 'tech'],
     boardCategory: 'Tech',
@@ -983,7 +983,7 @@ async function seedDatabase() {
     // Create users
     const createdUsers = await Promise.all(
       users.map(async (user) => {
-        const hashedPassword = await bcrypt.hash(user.password, 10);
+        // Don't hash password here - let the pre-save hook handle it
         // Analytics fields
         const loginCount = Math.floor(Math.random() * 50) + 1;
         const deviceType = getRandomDeviceType();
@@ -994,7 +994,7 @@ async function seedDatabase() {
         const activityScore = Math.floor(Math.random() * 991) + 10; // 10-1000
         return User.create({
           ...user,
-          password: hashedPassword,
+          // password is passed directly, pre-save hook will hash it
           lastLogin,
           loginCount,
           deviceType,

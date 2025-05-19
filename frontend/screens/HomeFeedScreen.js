@@ -7,10 +7,10 @@ import {
   RefreshControl,
   useWindowDimensions,
 } from 'react-native';
-import { Text, Card, ActivityIndicator, FAB, Searchbar, Chip, useTheme, IconButton } from 'react-native-paper';
+import { Text, Card, ActivityIndicator, FAB, Searchbar, Chip, useTheme, IconButton, Icon } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { dummyPins } from '../data/dummyData';
+import { usePins } from '../context/PinsContext';
 
 const MIN_COLUMN_WIDTH = 150; // Minimum width for each column
 const GRID_PADDING = 8; // Padding around the grid
@@ -33,8 +33,7 @@ const HomeFeedScreen = () => {
   const navigation = useNavigation();
   const theme = useTheme();
   const { width: screenWidth } = useWindowDimensions();
-  const [pins, setPins] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { pins, loading } = usePins(); // Use pins and loading from context
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -43,27 +42,14 @@ const HomeFeedScreen = () => {
   const numColumns = Math.max(2, Math.floor((screenWidth - (GRID_PADDING * 2)) / MIN_COLUMN_WIDTH));
   const columnWidth = (screenWidth - (GRID_PADDING * 2) - (CARD_MARGIN * 2 * numColumns)) / numColumns;
 
-  const fetchPins = async () => {
-    try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setPins(dummyPins);
-    } catch (error) {
-      console.error('Error fetching pins:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPins();
-  }, []);
-
-  const onRefresh = () => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchPins();
-  };
+    // In a real app, this would trigger a refetch from the API
+    // For now, just simulate a delay and set refreshing to false
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
 
   const filterPins = useCallback(() => {
     return pins.filter(pin => {
@@ -89,14 +75,31 @@ const HomeFeedScreen = () => {
         source={{ uri: item.imageUrl }} 
         style={[styles.image, { height: columnWidth * 1.3 }]} // 1.3 aspect ratio
       />
+      <View style={styles.statsContainer}>
+        <Text style={styles.statsText}>
+          <Icon name="eye" size={12} /> {item.views || 0}
+        </Text>
+        <Text style={styles.statsText}>
+          <Icon name="heart" size={12} /> {item.likes?.length || 0}
+        </Text>
+      </View>
       <Card.Title
         title={item.title}
-        subtitle={item.author.username}
+        subtitle={item.category || 'Uncategorized'}
         titleNumberOfLines={1}
         subtitleNumberOfLines={1}
         titleStyle={styles.cardTitle}
         subtitleStyle={styles.cardSubtitle}
       />
+      {item.tags && item.tags.length > 0 && (
+        <View style={styles.tagsContainer}>
+          {item.tags.slice(0, 2).map((tag, index) => (
+            <Chip key={index} style={styles.tag} textStyle={styles.tagText}>
+              {tag}
+            </Chip>
+          ))}
+        </View>
+      )}
     </Card>
   );
 
@@ -232,19 +235,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   searchBar: {
-    flex: 1,
-    elevation: 0,
+    backgroundColor: LIGHT_PURPLE_GREY,
     borderRadius: 8,
   },
   categoriesContainer: {
-    elevation: 2,
-    marginBottom: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    paddingVertical: 8,
   },
   categoriesList: {
-    paddingHorizontal: 8,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
   },
   categoryChip: {
     marginRight: 8,
@@ -263,6 +261,7 @@ const styles = StyleSheet.create({
   card: {
     margin: CARD_MARGIN,
     elevation: 2,
+    overflow: 'hidden',
   },
   image: {
     borderTopLeftRadius: 8,
@@ -275,6 +274,32 @@ const styles = StyleSheet.create({
   cardSubtitle: {
     fontSize: 10,
     lineHeight: 14,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    padding: 6,
+    paddingBottom: 0,
+    justifyContent: 'flex-end',
+  },
+  statsText: {
+    fontSize: 10,
+    marginLeft: 8,
+    color: '#666',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 6,
+    paddingTop: 0,
+  },
+  tag: {
+    height: 22,
+    marginRight: 4,
+    marginBottom: 4,
+    backgroundColor: '#f0f0f0',
+  },
+  tagText: {
+    fontSize: 8,
   },
   emptyText: {
     textAlign: 'center',

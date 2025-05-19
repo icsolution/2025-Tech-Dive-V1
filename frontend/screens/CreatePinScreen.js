@@ -10,7 +10,7 @@ import {
   FlatList,
   Dimensions,
 } from 'react-native';
-import { TextInput, Button, Text, Surface, HelperText, IconButton, useTheme } from 'react-native-paper';
+import { TextInput, Button, Text, Surface, HelperText, IconButton } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -34,7 +34,6 @@ const CreatePinScreen = () => {
   const [selectBoardModalVisible, setSelectBoardModalVisible] = useState(false);
   const { settings } = useSettings();
   const { darkMode } = settings;
-  const theme = useTheme();
 
   useEffect(() => {
     fetchBoards();
@@ -195,7 +194,7 @@ const CreatePinScreen = () => {
         >
           <TouchableOpacity 
             style={[styles.modalContent, {
-              backgroundColor: theme.colors.surface,
+              backgroundColor: darkMode ? '#333' : '#fff',
             }]}
             activeOpacity={1}
             onPress={(e) => e.stopPropagation()}
@@ -306,7 +305,7 @@ const CreatePinScreen = () => {
               onPress={() => setSelectBoardModalVisible(false)}
             >
               <View 
-                style={[styles.boardSelectionModal, { backgroundColor: theme.colors.surface }]}
+                style={[styles.boardSelectionModal, { backgroundColor: darkMode ? '#333' : '#fff' } ]}
                 onStartShouldSetResponder={() => true}
               >
                 <View style={[styles.modalHeader, { borderBottomColor: darkMode ? '#555' : '#ccc' }]}>

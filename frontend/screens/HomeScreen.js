@@ -5,7 +5,6 @@ import { Card, ActivityIndicator, FAB, Searchbar, IconButton, Menu } from 'react
 import { useAuth } from '../context/AuthContext';
 import { pinsAPI } from '../services/api';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { dummyPins } from '../data/dummyData';
 import { useSettings } from '../context/SettingsContext';
 
 const { width } = Dimensions.get('window');
@@ -26,60 +25,30 @@ const HomeScreen = () => {
   const fetchPins = async () => {
     try {
       setLoading(true);
-      // Use dummy data directly for now
-      console.log('Loading dummy pins data');
-
-      // Create a fixed set of pins with complete image URLs
-      const fixedPins = [
-        {
-          _id: 'pin1',
-          title: 'Mountain Adventure',
-          description: 'Hiking in the Swiss Alps',
-          imageUrl: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80',
-          author: { username: 'Sarah Wilson' },
-        },
-        {
-          _id: 'pin2',
-          title: 'Beautiful Sunset',
-          description: 'Captured this amazing sunset at the beach',
-          imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
-          author: { username: 'Alex Chen' },
-        },
-        {
-          _id: 'pin3',
-          title: 'Minimalist Living Room',
-          description: 'Clean and serene living space with natural light',
-          imageUrl: 'https://images.unsplash.com/photo-1449247709967-d4461a6a6103?auto=format&fit=crop&w=800&q=80',
-          author: { username: 'Maya Patel' },
-        },
-        {
-          _id: 'pin4',
-          title: 'Urban Photography',
-          description: 'City lights and architecture',
-          imageUrl: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=800&q=80',
-          author: { username: 'Alex Chen' },
-        },
-        {
-          _id: 'pin5',
-          title: 'Healthy Breakfast',
-          description: 'Start your day with nutritious food',
-          imageUrl: 'https://images.unsplash.com/photo-1494390248081-4e521a5940db?auto=format&fit=crop&w=800&q=80',
-          author: { username: 'Sarah Wilson' },
-        },
-        {
-          _id: 'pin6',
-          title: 'Travel Inspiration',
-          description: 'Exploring ancient ruins',
-          imageUrl: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=800&q=80',
-          author: { username: 'Maya Patel' },
-        }
-      ];
-
-      setPins(fixedPins);
+      console.log('Fetching pins from database');
+      
+      // Fetch pins from the API
+      const fetchedPins = await pinsAPI.getAllPins();
+      console.log('Fetched pins from database:', fetchedPins.length);
+      
+      // Process pins to ensure they have all required fields
+      const processedPins = fetchedPins.map(pin => ({
+        ...pin,
+        author: pin.user ? { username: pin.user.username } : { username: 'Unknown' },
+        likes: pin.likes || [],
+        saves: pin.saves || [],
+        comments: pin.comments || [],
+        tags: pin.tags || []
+      }));
+      
+      setPins(processedPins);
       setError(null);
     } catch (err) {
-      console.error('Error setting up pins:', err);
-      setError('Failed to load pins');
+      console.error('Error fetching pins from database:', err);
+      setError('Failed to load pins from database');
+      
+      // Fallback to empty pins array if fetch fails
+      setPins([]);
     } finally {
       setLoading(false);
     }
@@ -114,7 +83,10 @@ const HomeScreen = () => {
       />
       <View style={styles.pinTitle}>
         <Text numberOfLines={2} style={{ fontSize: 16, fontWeight: 'bold' }}>{item.title}</Text>
-        <Text numberOfLines={2} style={{ fontSize: 14, color: '#666' }}>{item.description}</Text>
+        <Text numberOfLines={2} style={{ fontSize: 14, color: '#666' }}>
+          {item.description}
+          {item.user && item.user.username && ` • ${item.user.username}`}
+        </Text>
       </View>
     </Card>
   );

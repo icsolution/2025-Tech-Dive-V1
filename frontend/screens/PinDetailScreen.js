@@ -29,14 +29,10 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Clipboard from 'expo-clipboard';
-import { 
-  getPinById, 
-  getCurrentUser, 
-  isPinLikedByUser, 
-  isPinSavedByUser,
-  getUserById,
-} from '../data/dummyData';
+import { getCurrentUser } from '../data/dummyData'; // Keep this for now until we have auth context
+import { usePins } from '../context/PinsContext';
 import { useSettings } from '../context/SettingsContext';
+import config from '../config';
 
 const { width } = Dimensions.get('window');
 
@@ -45,6 +41,19 @@ const PinDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { pinId } = route.params;
+  console.log('Pin ID from route params:', pinId);
+  
+  // Use the pins context
+  const { 
+    pins,
+    getPinById, 
+    toggleLike, 
+    toggleSave, 
+    isPinLikedByUser, 
+    isPinSavedByUser, 
+    addComment 
+  } = usePins();
+  
   const [pin, setPin] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -63,18 +72,48 @@ const PinDetailScreen = () => {
       setLoading(true);
       console.log('Fetching pin details for ID:', pinId);
       
-      const foundPin = getPinById(pinId);
+      // Make a direct API call to get the pin details from the database
+      const token = await AsyncStorage.getItem('token');
+      
+      // Find the pin in the context first if available
+      const contextPin = pins.find(p => p._id === pinId);
+      if (contextPin) {
+        console.log('Found pin in context:', contextPin.title);
+        setPin(contextPin);
+        setIsLiked(contextPin.likes && contextPin.likes.includes(currentUser._id));
+        setIsSaved(contextPin.saves && contextPin.saves.includes(currentUser._id));
+        setComments(contextPin.comments || []);
+        setLoading(false);
+        setRefreshing(false);
+        return;
+      }
+      
+      // If not in context, fetch from API
+      console.log('Fetching pin from API:', pinId);
+      const response = await fetch(`${config.API_URL}/pins/${pinId}`, {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch pin: ${response.status}`);
+      }
+      
+      const foundPin = await response.json();
       if (!foundPin) {
         throw new Error('Pin not found');
       }
 
-      console.log('Found pin:', foundPin);
+      console.log('Found pin from API:', foundPin.title);
       setPin(foundPin);
-      setIsLiked(isPinLikedByUser(foundPin));
-      setIsSaved(isPinSavedByUser(foundPin));
+      setIsLiked(foundPin.likes && foundPin.likes.includes(currentUser._id));
+      setIsSaved(foundPin.saves && foundPin.saves.includes(currentUser._id));
       setComments(foundPin.comments || []);
     } catch (error) {
       console.error('Error fetching pin details:', error);
+      // Show error state in the UI
+      navigation.goBack(); // Return to previous screen on error
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -92,14 +131,12 @@ const PinDetailScreen = () => {
 
   const handleLike = async () => {
     try {
-      // Simulate API call
-      setIsLiked(!isLiked);
-      setPin(prev => ({
-        ...prev,
-        likes: isLiked
-          ? prev.likes.filter(id => id !== currentUser._id)
-          : [...prev.likes, currentUser._id],
-      }));
+      // Use the context function to toggle like
+      const updatedPin = await toggleLike(pinId, currentUser._id);
+      if (updatedPin) {
+        setPin(updatedPin);
+        setIsLiked(!isLiked);
+      }
     } catch (error) {
       console.error('Error liking pin:', error);
     }
@@ -107,18 +144,26 @@ const PinDetailScreen = () => {
 
   const handleSave = async () => {
     try {
-      // Simulate API call
-      setIsSaved(!isSaved);
-      setPin(prev => ({
-        ...prev,
-        saves: isSaved
-          ? prev.saves.filter(id => id !== currentUser._id)
-          : [...prev.saves, currentUser._id],
-      }));
+      console.log('Starting handleSave with pinId:', pinId);
+      
+      // Ensure pinId is a valid value
+      if (!pinId) {
+        console.error('Invalid pinId:', pinId);
+        return;
+      }
+      
+      // Use the context function to toggle save
+      const updatedPin = await toggleSave(pinId, currentUser._id);
+      if (updatedPin) {
+        setPin(updatedPin);
+        setIsSaved(!isSaved);
+        console.log('Pin saved state updated successfully');
+      }
     } catch (error) {
       console.error('Error saving pin:', error);
     }
   };
+
 
   const handleShare = async () => {
     try {

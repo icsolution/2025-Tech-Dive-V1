@@ -5,6 +5,7 @@ import { PaperProvider, MD3LightTheme, MD3DarkTheme, FAB } from 'react-native-pa
 import { StatusBar } from 'expo-status-bar';
 import { SettingsProvider, useSettings } from './context/SettingsContext';
 import { AuthProvider } from './context/AuthContext';
+import { PinsProvider } from './context/PinsContext';
 import { DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { View, StyleSheet } from 'react-native';
 import * as Font from 'expo-font';
@@ -82,7 +83,9 @@ export default function App() {
   return (
     <AuthProvider>
       <SettingsProvider>
-        <MainApp />
+        <PinsProvider>
+          <MainApp />
+        </PinsProvider>
       </SettingsProvider>
     </AuthProvider>
   );
