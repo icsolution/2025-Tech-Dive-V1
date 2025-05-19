@@ -190,7 +190,10 @@ const CreatePinScreen = () => {
         <TouchableOpacity 
           style={[styles.overlay, darkMode && { backgroundColor: 'rgba(0, 0, 0, 0.9)' }]} 
           activeOpacity={1} 
-          onPress={() => setModalVisible(false)}
+          onPress={() => {
+            setModalVisible(false);
+            navigation.goBack();
+          }}
         >
           <TouchableOpacity 
             style={[styles.modalContent, {
@@ -206,7 +209,10 @@ const CreatePinScreen = () => {
               <IconButton
                 icon={() => <MaterialCommunityIcons name="close" size={24} color="#FFFFFF" />}
                 size={24}
-                onPress={() => setModalVisible(false)}
+                onPress={() => {
+            setModalVisible(false);
+            navigation.goBack();
+          }}
                 style={styles.closeButton}
               />
             </View>

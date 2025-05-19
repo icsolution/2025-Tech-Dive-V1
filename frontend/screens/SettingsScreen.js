@@ -5,6 +5,7 @@ import {
   ScrollView,
   Switch,
   Platform,
+  Dimensions,
 } from 'react-native';
 import {
   Text,
@@ -110,53 +111,59 @@ const SettingsScreen = () => {
               ),
             })}
 
-            {renderMenuItem({
-              title: "Grid Size",
-              description: "Adjust pin grid size",
-              icon: props => <MaterialCommunityIcons name="view-grid" size={props.size ?? 24} color={theme.colors.primary} />,
-              right: props => (
-                <Menu
-                  visible={showGridSizeMenu}
-                  onDismiss={() => setShowGridSizeMenu(false)}
-                  anchor={
-                    <IconButton
-                      {...props}
-                      icon="chevron-right"
-                      onPress={() => setShowGridSizeMenu(true)}
-                      iconColor={theme.colors.primary}
-                    />
-                  }
-                >
-                  <Menu.Item
-                    onPress={() => {
-                      updateSetting('gridSize', 'small');
-                      setShowGridSizeMenu(false);
-                    }}
-                    title="Small"
-                    leadingIcon={({ size, color }) => <MaterialCommunityIcons name="grid" size={size} color={color} /> }
-                    disabled={settings.gridSize === 'small'}
-                  />
-                  <Menu.Item
-                    onPress={() => {
-                      updateSetting('gridSize', 'medium');
-                      setShowGridSizeMenu(false);
-                    }}
-                    title="Medium"
-                    leadingIcon={({ size, color }) => <MaterialCommunityIcons name="grid" size={size} color={color} /> }
-                    disabled={settings.gridSize === 'medium'}
-                  />
-                  <Menu.Item
-                    onPress={() => {
-                      updateSetting('gridSize', 'large');
-                      setShowGridSizeMenu(false);
-                    }}
-                    title="Large"
-                    leadingIcon={({ size, color }) => <MaterialCommunityIcons name="grid" size={size} color={color} /> }
-                    disabled={settings.gridSize === 'large'}
-                  />
-                </Menu>
-              ),
-            })}
+            <List.Item
+              title="Grid Size"
+              description="Adjust pin grid size"
+              left={props => <MaterialCommunityIcons name="view-grid" size={props.size ?? 24} color={theme.colors.primary} />}
+              right={props => (
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={{ marginRight: 8, color: theme.colors.primary }}>
+                    {settings.gridSize.charAt(0).toUpperCase() + settings.gridSize.slice(1)}
+                  </Text>
+                  <MaterialCommunityIcons name="chevron-right" size={24} color={theme.colors.primary} />
+                </View>
+              )}
+              onPress={() => setShowGridSizeMenu(true)}
+              style={styles.listItem}
+              titleStyle={styles.listItemTitle}
+              descriptionStyle={styles.listItemDescription}
+            />
+
+            <Portal>
+              <Menu
+                visible={showGridSizeMenu}
+                onDismiss={() => setShowGridSizeMenu(false)}
+                anchor={{ x: Dimensions.get('window').width / 2, y: 200 }}
+              >
+                <Menu.Item
+                  onPress={() => {
+                    updateSetting('gridSize', 'small');
+                    setShowGridSizeMenu(false);
+                  }}
+                  title="Small"
+                  leadingIcon={({ size, color }) => <MaterialCommunityIcons name="view-grid" size={size} color={color} />}
+                  disabled={settings.gridSize === 'small'}
+                />
+                <Menu.Item
+                  onPress={() => {
+                    updateSetting('gridSize', 'medium');
+                    setShowGridSizeMenu(false);
+                  }}
+                  title="Medium"
+                  leadingIcon={({ size, color }) => <MaterialCommunityIcons name="view-grid-outline" size={size} color={color} />}
+                  disabled={settings.gridSize === 'medium'}
+                />
+                <Menu.Item
+                  onPress={() => {
+                    updateSetting('gridSize', 'large');
+                    setShowGridSizeMenu(false);
+                  }}
+                  title="Large"
+                  leadingIcon={({ size, color }) => <MaterialCommunityIcons name="view-column" size={size} color={color} />}
+                  disabled={settings.gridSize === 'large'}
+                />
+              </Menu>
+            </Portal>
           </>
         ))}
 

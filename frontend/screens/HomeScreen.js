@@ -8,8 +8,22 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSettings } from '../context/SettingsContext';
 
 const { width } = Dimensions.get('window');
-const numColumns = 2;
-const pinWidth = (width - 48) / numColumns; // 48 = padding (16) * 2 + gap (16)
+
+// Fixed configurations for different grid sizes
+const GRID_CONFIGS = {
+  small: {
+    numColumns: 3,
+    pinWidth: (width - 64) / 3, // 64 = padding (16) * 2 + gap (16) * 2
+  },
+  medium: {
+    numColumns: 2,
+    pinWidth: (width - 48) / 2, // 48 = padding (16) * 2 + gap (16)
+  },
+  large: {
+    numColumns: 1,
+    pinWidth: width - 32, // 32 = padding (16) * 2
+  }
+};
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -20,7 +34,10 @@ const HomeScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [menuVisible, setMenuVisible] = useState(false);
   const { settings } = useSettings();
-  const { darkMode } = settings;
+  const { darkMode, gridSize } = settings;
+  
+  // Get grid configuration based on settings
+  const { numColumns, pinWidth } = GRID_CONFIGS[gridSize] || GRID_CONFIGS.medium;
 
   const fetchPins = async () => {
     try {
@@ -54,6 +71,8 @@ const HomeScreen = () => {
     }
   };
 
+  // We don't need to force re-renders anymore since we're using conditional rendering
+
   useEffect(() => {
     fetchPins();
     const unsubscribe = navigation.addListener('refreshHome', () => {
@@ -69,7 +88,7 @@ const HomeScreen = () => {
 
   const renderPin = ({ item }) => (
     <Card
-      style={styles.pinCard}
+      style={[styles.pinCard, { width: pinWidth }]}
       onPress={() => navigation.navigate('PinDetail', { pinId: item._id })}
     >
       <Card.Cover
@@ -179,14 +198,37 @@ const HomeScreen = () => {
         />
       </View>
 
-      <FlatList
-        data={filteredPins}
-        renderItem={renderPin}
-        keyExtractor={(item) => item._id}
-        numColumns={numColumns}
-        contentContainerStyle={styles.pinGrid}
-        showsVerticalScrollIndicator={false}
-      />
+      {/* Render different FlatList components based on grid size */}
+      {gridSize === 'small' && (
+        <FlatList
+          data={filteredPins}
+          renderItem={renderPin}
+          keyExtractor={(item) => item._id}
+          numColumns={GRID_CONFIGS.small.numColumns}
+          contentContainerStyle={styles.pinGrid}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
+      {gridSize === 'medium' && (
+        <FlatList
+          data={filteredPins}
+          renderItem={renderPin}
+          keyExtractor={(item) => item._id}
+          numColumns={GRID_CONFIGS.medium.numColumns}
+          contentContainerStyle={styles.pinGrid}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
+      {gridSize === 'large' && (
+        <FlatList
+          data={filteredPins}
+          renderItem={renderPin}
+          keyExtractor={(item) => item._id}
+          numColumns={GRID_CONFIGS.large.numColumns}
+          contentContainerStyle={styles.pinGrid}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
       <FAB
         icon={({ size, color }) => (
           <MaterialCommunityIcons name="plus" size={size} color={color} />
@@ -238,13 +280,12 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   pinCard: {
-    width: pinWidth,
     marginBottom: 16,
     marginRight: 16,
     elevation: 2,
   },
   pinImage: {
-    height: pinWidth,
+    aspectRatio: 1, // This maintains the aspect ratio regardless of width
     backgroundColor: '#f0f0f0',  
   },
   pinTitle: {
