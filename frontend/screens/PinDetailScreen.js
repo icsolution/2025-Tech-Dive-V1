@@ -79,9 +79,18 @@ const PinDetailScreen = () => {
       const contextPin = pins.find(p => p._id === pinId);
       if (contextPin) {
         console.log('Found pin in context:', contextPin.title);
-        setPin(contextPin);
-        setIsLiked(contextPin.likes && contextPin.likes.includes(currentUser._id));
-        setIsSaved(contextPin.saves && contextPin.saves.includes(currentUser._id));
+        // Ensure pin has all required properties with proper types
+        const processedPin = {
+          ...contextPin,
+          likes: Array.isArray(contextPin.likes) ? contextPin.likes : [],
+          saves: Array.isArray(contextPin.saves) ? contextPin.saves : [],
+          comments: Array.isArray(contextPin.comments) ? contextPin.comments : [],
+          tags: Array.isArray(contextPin.tags) ? contextPin.tags : []
+        };
+        
+        setPin(processedPin);
+        setIsLiked(processedPin.likes.includes(currentUser._id));
+        setIsSaved(processedPin.saves.includes(currentUser._id));
         setComments(contextPin.comments || []);
         setLoading(false);
         setRefreshing(false);
@@ -106,9 +115,19 @@ const PinDetailScreen = () => {
       }
 
       console.log('Found pin from API:', foundPin.title);
-      setPin(foundPin);
-      setIsLiked(foundPin.likes && foundPin.likes.includes(currentUser._id));
-      setIsSaved(foundPin.saves && foundPin.saves.includes(currentUser._id));
+      
+      // Ensure pin has all required properties with proper types
+      const processedPin = {
+        ...foundPin,
+        likes: Array.isArray(foundPin.likes) ? foundPin.likes : [],
+        saves: Array.isArray(foundPin.saves) ? foundPin.saves : [],
+        comments: Array.isArray(foundPin.comments) ? foundPin.comments : [],
+        tags: Array.isArray(foundPin.tags) ? foundPin.tags : []
+      };
+      
+      setPin(processedPin);
+      setIsLiked(processedPin.likes.includes(currentUser._id));
+      setIsSaved(processedPin.saves.includes(currentUser._id));
       setComments(foundPin.comments || []);
     } catch (error) {
       console.error('Error fetching pin details:', error);
@@ -121,7 +140,14 @@ const PinDetailScreen = () => {
   };
 
   useEffect(() => {
-    fetchPinDetails();
+    console.log('PinDetailScreen useEffect triggered with pinId:', pinId);
+    if (pinId) {
+      fetchPinDetails();
+    } else {
+      console.error('No pinId provided to PinDetailScreen');
+      setLoading(false);
+      navigation.goBack();
+    }
   }, [pinId]);
 
   const onRefresh = () => {
@@ -211,27 +237,41 @@ const PinDetailScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: darkMode ? '#333' : '#fff' }]}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
+      <View style={[styles.container, styles.centered, { backgroundColor: darkMode ? '#333' : '#fff' }]}>
+        <ActivityIndicator size="large" color="#E60023" />
       </View>
     );
   }
 
   if (!pin) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: darkMode ? '#333' : '#fff' }]}>
-        <Text style={{ color: darkMode ? '#fff' : '#000' }}>No pin found</Text>
+      <View style={[styles.container, styles.centered, { backgroundColor: darkMode ? '#333' : '#fff' }]}>
+        <Text style={{ color: darkMode ? '#fff' : '#000' }}>Pin not found</Text>
+        <Button 
+          mode="contained" 
+          onPress={() => navigation.goBack()}
+          style={{ marginTop: 16, backgroundColor: '#E60023' }}
+        >
+          Go Back
+        </Button>
       </View>
     );
   }
 
-  return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: darkMode ? '#333' : '#fff' }]}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
+  // Wrap the entire render in a try-catch to prevent crashes
+  try {
+    return (
+      <ScrollView
+        style={[styles.container, { backgroundColor: darkMode ? '#333' : '#fff' }]}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#E60023']}
+            tintColor={darkMode ? '#fff' : '#E60023'}
+          />
+        }
+      >
       <Image
         source={{ uri: pin.imageUrl }}
         style={styles.image}
@@ -282,61 +322,69 @@ const PinDetailScreen = () => {
           </Text>
         </View>
 
-        {/* Author Info */}
-        <TouchableOpacity
-          style={styles.authorSection}
-          onPress={() => navigation.navigate('Profile', { userId: pin.author._id })}
-        >
-          <Avatar.Image
-            source={{ uri: pin.author.avatar }}
-            size={40}
-          />
-          <View style={styles.authorInfo}>
-            <Text variant="titleMedium" style={{ color: darkMode ? '#fff' : '#000' }}>
-              {pin.author.username}
-            </Text>
-            <Text variant="bodyMedium" style={{ color: darkMode ? '#ccc' : '#666' }}>
-              {pin.author.bio}
-            </Text>
-          </View>
-        </TouchableOpacity>
+        {/* Author Info - Only show if author data exists */}
+        {pin.author && (
+          <TouchableOpacity
+            style={styles.authorSection}
+            onPress={() => pin.author._id && navigation.navigate('Profile', { userId: pin.author._id })}
+          >
+            <Avatar.Image
+              source={{ uri: pin.author.avatar || 'https://via.placeholder.com/40' }}
+              size={40}
+            />
+            <View style={styles.authorInfo}>
+              <Text variant="titleMedium" style={{ color: darkMode ? '#fff' : '#000' }}>
+                {pin.author.username || 'Unknown User'}
+              </Text>
+              <Text variant="bodyMedium" style={{ color: darkMode ? '#ccc' : '#666' }}>
+                {pin.author.bio || 'No bio available'}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
 
         <Divider style={[styles.divider, { backgroundColor: darkMode ? '#555' : '#ddd' }]} />
 
-        {/* Board Info */}
-        <TouchableOpacity
-          style={styles.boardSection}
-          onPress={() => navigation.navigate('BoardDetail', { boardId: pin.board._id })}
-        >
-          <Image
-            source={{ uri: pin.board.coverImage }}
-            style={styles.boardThumbnail}
-          />
-          <View style={styles.boardInfo}>
-            <Text variant="titleMedium" style={{ color: darkMode ? '#fff' : '#000' }}>
-              {pin.board.name}
-            </Text>
-            <Text variant="bodyMedium" style={{ color: darkMode ? '#ccc' : '#666' }}>
-              {pin.board.description}
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        <Divider style={[styles.divider, { backgroundColor: darkMode ? '#555' : '#ddd' }]} />
-
-        {/* Tags */}
-        <View style={styles.tagsContainer}>
-          {pin.tags.map((tag, index) => (
-            <Chip
-              key={index}
-              style={[styles.tag, { backgroundColor: darkMode ? '#555' : '#ddd' }]}
-              textStyle={{ color: darkMode ? '#fff' : '#000' }}
-              onPress={() => navigation.navigate('Search', { query: tag })}
+        {/* Board Info - Only show if board data exists */}
+        {pin.board && pin.board._id && (
+          <>
+            <TouchableOpacity
+              style={styles.boardSection}
+              onPress={() => navigation.navigate('BoardDetail', { boardId: pin.board._id })}
             >
-              {tag}
-            </Chip>
-          ))}
-        </View>
+              <Image
+                source={{ uri: pin.board.coverImage || 'https://via.placeholder.com/50' }}
+                style={styles.boardThumbnail}
+              />
+              <View style={styles.boardInfo}>
+                <Text variant="titleMedium" style={{ color: darkMode ? '#fff' : '#000' }}>
+                  {pin.board.name || 'Untitled Board'}
+                </Text>
+                <Text variant="bodyMedium" style={{ color: darkMode ? '#ccc' : '#666' }}>
+                  {pin.board.description || 'No description'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </>
+        )}
+
+        <Divider style={[styles.divider, { backgroundColor: darkMode ? '#555' : '#ddd' }]} />
+
+        {/* Tags - Only show if tags exist */}
+        {pin.tags && pin.tags.length > 0 && (
+          <View style={styles.tagsContainer}>
+            {pin.tags.map((tag, index) => (
+              <Chip
+                key={index}
+                style={[styles.tag, { backgroundColor: darkMode ? '#555' : '#ddd' }]}
+                textStyle={{ color: darkMode ? '#fff' : '#000' }}
+                onPress={() => navigation.navigate('Search', { query: tag })}
+              >
+                {tag}
+              </Chip>
+            ))}
+          </View>
+        )}
 
         <Divider style={[styles.divider, { backgroundColor: darkMode ? '#555' : '#ddd' }]} />
 
@@ -478,6 +526,23 @@ const PinDetailScreen = () => {
       </Portal>
     </ScrollView>
   );
+  } catch (error) {
+    console.error('Error rendering PinDetailScreen:', error);
+    return (
+      <View style={[styles.container, styles.centered, { backgroundColor: darkMode ? '#333' : '#fff' }]}>
+        <Text style={{ color: darkMode ? '#fff' : '#000', marginBottom: 16, textAlign: 'center' }}>
+          Something went wrong while displaying this pin.
+        </Text>
+        <Button 
+          mode="contained" 
+          onPress={() => navigation.goBack()}
+          style={{ backgroundColor: '#E60023' }}
+        >
+          Go Back
+        </Button>
+      </View>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
@@ -488,6 +553,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   image: {
     width: width,

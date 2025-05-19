@@ -86,10 +86,15 @@ const HomeScreen = () => {
     pin.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const renderPin = ({ item }) => (
+  const renderPin = ({ item }) => {
+    console.log('Pin being rendered:', item.title, 'ID:', item._id);
+    return (
     <Card
       style={[styles.pinCard, { width: pinWidth }]}
-      onPress={() => navigation.navigate('PinDetail', { pinId: item._id })}
+      onPress={() => {
+        console.log('Navigating to pin detail with ID:', item._id);
+        navigation.navigate('PinDetail', { pinId: item._id });
+      }}
     >
       <Card.Cover
         source={{ uri: item.imageUrl }}
@@ -102,13 +107,14 @@ const HomeScreen = () => {
       />
       <View style={styles.pinTitle}>
         <Text numberOfLines={2} style={{ fontSize: 16, fontWeight: 'bold' }}>{item.title}</Text>
-        <Text numberOfLines={2} style={{ fontSize: 14, color: '#666' }}>
-          {item.description}
+        <Text numberOfLines={1} style={{ fontSize: 14, color: '#666' }}>
+          {item.category ? `${item.category}` : 'Uncategorized'}
           {item.user && item.user.username && ` • ${item.user.username}`}
         </Text>
       </View>
     </Card>
   );
+  };
 
   if (loading) {
     return (
