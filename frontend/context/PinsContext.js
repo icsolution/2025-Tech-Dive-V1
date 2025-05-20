@@ -159,19 +159,17 @@ export const PinsProvider = ({ children }) => {
       // Then update on the server
       const token = await AsyncStorage.getItem('token');
       
-      // For now, return the locally updated pin to make the feature work
-      // We'll implement the server update when the API is ready
-      console.log('Like toggled successfully (local update only)');
-      return updatedPin;
-      
-      /* Commented out server update until API is ready
+      // Connect to the updated backend API
       const response = await fetch(`${config.API_URL}/pins/${pinId}/like`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token ? `Bearer ${token}` : '',
         },
-        body: JSON.stringify({ userId, action: isLiked ? 'unlike' : 'like' })
+        body: JSON.stringify({ 
+          userId, 
+          action: isLiked ? 'unlike' : 'like' 
+        })
       });
       
       if (!response.ok) {
@@ -184,10 +182,11 @@ export const PinsProvider = ({ children }) => {
       
       const serverUpdatedPin = await response.json();
       return serverUpdatedPin;
-      */
     } catch (error) {
       console.error('Error toggling like:', error);
-      return null;
+      // Return the locally updated pin as fallback if server update fails
+      // Make sure updatedPin is defined before returning it
+      return updatedPin || null;
     }
   };
 
@@ -231,19 +230,17 @@ export const PinsProvider = ({ children }) => {
       // Then update on the server
       const token = await AsyncStorage.getItem('token');
       
-      // For now, return the locally updated pin to make the feature work
-      // We'll implement the server update when the API is ready
-      console.log('Save toggled successfully (local update only)');
-      return updatedPin;
-      
-      /* Commented out server update until API is ready
+      // Connect to the updated backend API
       const response = await fetch(`${config.API_URL}/pins/${pinId}/save`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token ? `Bearer ${token}` : '',
         },
-        body: JSON.stringify({ userId, action: isSaved ? 'unsave' : 'save' })
+        body: JSON.stringify({ 
+          userId, 
+          action: isSaved ? 'unsave' : 'save' 
+        })
       });
       
       if (!response.ok) {
@@ -256,10 +253,11 @@ export const PinsProvider = ({ children }) => {
       
       const serverUpdatedPin = await response.json();
       return serverUpdatedPin;
-      */
     } catch (error) {
       console.error('Error toggling save:', error);
-      return null;
+      // Return the locally updated pin as fallback if server update fails
+      // Make sure updatedPin is defined before returning it
+      return updatedPin || null;
     }
   };
 

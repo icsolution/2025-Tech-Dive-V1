@@ -157,11 +157,20 @@ const PinDetailScreen = () => {
 
   const handleLike = async () => {
     try {
+      console.log('Starting handleLike with pinId:', pinId);
+      
+      // Ensure pinId is a valid value
+      if (!pinId) {
+        console.error('Invalid pinId:', pinId);
+        return;
+      }
+      
       // Use the context function to toggle like
       const updatedPin = await toggleLike(pinId, currentUser._id);
       if (updatedPin) {
         setPin(updatedPin);
         setIsLiked(!isLiked);
+        console.log('Pin like state updated successfully');
       }
     } catch (error) {
       console.error('Error liking pin:', error);
