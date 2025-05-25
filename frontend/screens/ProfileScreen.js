@@ -75,19 +75,52 @@ const ProfileScreen = () => {
     }
   };
 
+  const fetchUserSavedPins = async (userId) => {
+    if (!userId) return;
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch(`${config.API_URL}/pins/saved/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch saved pins');
+      }
+      const savedPins = await response.json();
+      setUserPins(savedPins);
+    } catch (error) {
+      console.error('Error fetching saved pins:', error);
+    }
+  };
+
   useEffect(() => {
     fetchUserProfile();
     const unsubscribe = navigation.addListener('refreshProfile', () => {
-      if (route.params?.refresh) {
-        fetchUserProfile();
+      // When refreshProfile event is heard, re-fetch user profile and saved pins
+      fetchUserProfile();
+      // Only fetch saved pins if user data is already available
+      // This avoids issues if user is null during the initial fetchUserProfile
+      if (user && user._id) {
+        fetchUserSavedPins(user._id);
       }
     });
     return unsubscribe;
   }, [navigation, route.params]);
 
+  useEffect(() => {
+    if (user && selectedView === 'pins') {
+      fetchUserSavedPins(user._id);
+    }
+  }, [user, selectedView]);
+
   const onRefresh = () => {
     setRefreshing(true);
     fetchUserProfile();
+    if (user) {
+      fetchUserSavedPins(user._id);
+    }
   };
 
   const handleLogout = async () => {

@@ -132,6 +132,18 @@ router.put('/:id/save', async (req, res) => {
   }
 });
 
+// Get all pins saved by a specific user
+router.get('/saved/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const savedPins = await Pin.find({ saves: userId }).sort({ createdAt: -1 });
+    res.json(savedPins);
+  } catch (error) {
+    console.error('Get saved pins error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Like/Unlike pin - Enhanced version with comprehensive logging
 router.put('/:id/like', async (req, res) => {
   const requestId = Math.random().toString(36).substring(2, 8);

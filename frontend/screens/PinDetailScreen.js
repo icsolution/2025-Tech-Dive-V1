@@ -200,40 +200,26 @@ const PinDetailScreen = () => {
   };
 
   useEffect(() => {
-    console.log('PinDetailScreen useEffect triggered with pinId:', pinId);
-    
-    // Check if we have a valid pinId
-    if (!pinId) {
-      console.error('No pinId provided to PinDetailScreen');
-      setLoading(false);
-      navigation.goBack();
-      return;
-    }
-    
-    // If auth is still initializing, wait for it
-    if (!authInitialized) {
-      console.log('Auth not yet initialized, waiting...');
-      return;
-    }
-    
-    // If auth is loading, wait for it
-    if (authLoading) {
-      console.log('Auth is loading, waiting...');
-      return;
-    }
-    
-    // Check if we need to refresh auth
-    if (!currentUser) {
-      console.log('No current user, attempting to refresh auth state...');
-      refreshAuth().then(() => {
-        console.log('Auth refreshed, fetching pin details');
-        fetchPinDetails();
-      });
-    } else {
-      console.log('User authenticated, fetching pin details');
-      fetchPinDetails();
-    }
-  }, [pinId, authInitialized, authLoading, currentUser]);
+    fetchPinDetails();
+  }, [pinId, currentUser, authInitialized]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      // Check if the action is going back
+      if (e.data.action.type === 'GO_BACK') {
+        // Trigger refresh on ProfileScreen
+        navigation.dispatch({
+          ...e.data.action,
+          payload: {
+            ...e.data.action.payload,
+            params: { refresh: true },
+          },
+        });
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const onRefresh = () => {
     setRefreshing(true);
