@@ -3,11 +3,11 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Image,
   RefreshControl,
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
+import ImageWithLoading from '../components/ImageWithLoading';
 import {
   Text,
   Button,
@@ -105,10 +105,11 @@ const ProfileScreen = () => {
       style={styles.pinContainer}
       onPress={() => navigation.navigate('PinDetail', { pinId: pin._id })}
     >
-      <Image
-        source={{ uri: pin.imageUrl }}
+      <ImageWithLoading
+        source={pin.imageUrl}
         style={styles.pinImage}
-        resizeMode="cover"
+        width={pinSize}
+        quality={70}
       />
     </TouchableOpacity>
   );
@@ -119,10 +120,11 @@ const ProfileScreen = () => {
       style={styles.boardContainer}
       onPress={() => navigation.navigate('BoardDetail', { boardId: board._id })}
     >
-      <Image
-        source={{ uri: board.coverImage }}
+      <ImageWithLoading
+        source={board.coverImage}
         style={styles.boardCover}
-        resizeMode="cover"
+        width={width / 2 - 16}
+        quality={80}
       />
       <View style={styles.boardInfo}>
         <Text>
@@ -167,9 +169,11 @@ const ProfileScreen = () => {
             />
           </View>
 
-          <Image
-            source={{ uri: user?.avatar }}
+          <ImageWithLoading
+            source={user.avatar}
             style={styles.avatar}
+            width={120}
+            quality={80}
           />
           <Text variant="headlineSmall" style={styles.username}>
             {user?.username}

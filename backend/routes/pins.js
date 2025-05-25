@@ -30,12 +30,13 @@ router.get('/:id', async (req, res) => {
 // Create pin
 router.post('/', async (req, res) => {
   try {
-    const { title, description, imageUrl, userId } = req.body;
+    const { title, description, imageUrl, userId, category } = req.body;
     const pin = new Pin({
       title,
       description,
       imageUrl,
       user: userId,
+      category
     });
     await pin.save();
     res.status(201).json(pin);
@@ -51,8 +52,8 @@ router.put('/:id', async (req, res) => {
     const { title, description } = req.body;
     const pin = await Pin.findByIdAndUpdate(
       req.params.id,
-      { title, description },
-      { new: true }
+      { title, description, updatedAt: new Date() },
+      { new: true, runValidators: true }
     );
     if (!pin) {
       return res.status(404).json({ message: 'Pin not found' });

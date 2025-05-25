@@ -71,4 +71,16 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
+};
+
+// Utility function for debugging - can be called from anywhere to clear the token
+export const clearAuthToken = async () => {
+  try {
+    await AsyncStorage.removeItem('token');
+    console.log('Authentication token cleared successfully');
+    return true;
+  } catch (error) {
+    console.error('Failed to clear authentication token:', error);
+    return false;
+  }
 }; 

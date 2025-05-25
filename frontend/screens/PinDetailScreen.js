@@ -3,13 +3,13 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Image,
   Dimensions,
   RefreshControl,
   Share,
   TouchableOpacity,
   Linking,
 } from 'react-native';
+import ImageWithLoading from '../components/ImageWithLoading';
 import {
   Text,
   Button,
@@ -281,10 +281,15 @@ const PinDetailScreen = () => {
           />
         }
       >
-      <Image
-        source={{ uri: pin.imageUrl }}
+      <ImageWithLoading
+        source={pin.imageUrl}
         style={styles.image}
-        resizeMode="cover"
+        width={width}
+        quality={90}
+        onError={(error) => {
+          console.error('Image loading error:', error);
+          console.log('Failed URL:', pin.imageUrl);
+        }}
       />
 
       <Surface style={[styles.content, { backgroundColor: darkMode ? '#444' : '#fff' }]}>
@@ -609,11 +614,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  boardThumbnail: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 12,
+  image: {
+    width: '100%',
+    height: 400,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    backgroundColor: '#f5f5f5',
   },
   boardInfo: {
     flex: 1,

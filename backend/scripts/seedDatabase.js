@@ -343,7 +343,7 @@ const additionalPins = [
   {
     title: 'Backpacking Essentials',
     description: 'Complete packing list for long-term travel. Includes gear recommendations and space-saving tips.',
-    imageUrl: 'https://images.unsplash.com/photo-1710031338984-0c1c28090dd8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    imageUrl: 'https://images.unsplash.com/photo-1500835556837-99ac94a94552?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Travel',
     tags: ['backpacking', 'travel tips', 'packing'],
     boardCategory: 'Travel Tips',
@@ -464,7 +464,7 @@ const additionalUserPins = [
   {
     title: 'Latte Art Tutorial',
     description: 'Master the art of latte decoration. Basic to advanced patterns.',
-    imageUrl: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Coffee',
     tags: ['coffee', 'latte art', 'tutorial'],
     boardCategory: 'Coffee',
@@ -647,7 +647,7 @@ const morePins = [
   {
     title: 'HIIT Workout Guide',
     description: 'High-intensity interval training routine. 30-minute workout with proper form demonstrations.',
-    imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Fitness',
     tags: ['hiit', 'workout', 'fitness'],
     boardCategory: 'Fitness',
@@ -655,7 +655,7 @@ const morePins = [
   {
     title: 'Protein Smoothie Recipes',
     description: 'Healthy protein smoothie recipes for post-workout recovery. Includes nutritional information.',
-    imageUrl: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Fitness',
     tags: ['smoothie', 'protein', 'healthy'],
     boardCategory: 'Fitness',
@@ -691,7 +691,7 @@ const morePins = [
   {
     title: 'Car Photography Tips',
     description: 'Professional car photography techniques. Lighting, angles, and post-processing guide.',
-    imageUrl: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?ixlib=rb-4.0.3&w=800&auto=format&fit=crop&q=80',
     category: 'Automotive',
     tags: ['photography', 'cars', 'automotive'],
     boardCategory: 'Automotive',
@@ -1043,7 +1043,7 @@ async function seedDatabase() {
 
       // Analytics fields for pins
       const views = Math.floor(Math.random() * 991) + 10; // 10-1000
-      const saves = Math.floor(Math.random() * 200) + 1;
+      const savesCount = Math.floor(Math.random() * 200) + 1; // Renamed from 'saves' to avoid conflict with Pin model field
       const clicks = Math.floor(Math.random() * 301);
       const viewDuration = Math.floor(Math.random() * 4991) + 10; // 10-5000 sec
       const deviceTypes = getRandomDeviceTypesCount(views);
@@ -1054,8 +1054,12 @@ async function seedDatabase() {
         user: user._id,
         board: board ? board._id : null,
         views,
-        saves,
-        clicks,
+        // Use savesCount for the analytics.saves field instead of directly assigning to saves array
+        analytics: {
+          saves: savesCount,
+          clicks: clicks,
+          impressions: views
+        },
         viewDuration,
         deviceTypes,
         locations

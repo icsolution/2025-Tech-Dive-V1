@@ -101,7 +101,10 @@ export const authAPI = {
       console.log('getCurrentUser successful response:', data);
       return data;
     } catch (error) {
-      console.error('getCurrentUser API error:', error);
+      console.error('getCurrentUser API error (raw):', error);
+      console.error('getCurrentUser API error (message):', error.message);
+      console.error('getCurrentUser API error (stack):', error.stack);
+      console.error('getCurrentUser API error (stringified):', JSON.stringify(error, Object.getOwnPropertyNames(error)));
       throw error;
     }
   },

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Dimensions, Text } from 'react-native';
+import { View, FlatList, StyleSheet, Dimensions, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Card, ActivityIndicator, FAB, Searchbar, IconButton, Menu } from 'react-native-paper';
+import { ActivityIndicator, FAB, Searchbar, IconButton, Menu } from 'react-native-paper';
 import { useAuth } from '../context/AuthContext';
 import { pinsAPI } from '../services/api';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSettings } from '../context/SettingsContext';
+import ImageWithLoading from '../components/ImageWithLoading';
 
 const { width } = Dimensions.get('window');
 
@@ -87,33 +88,43 @@ const HomeScreen = () => {
   );
 
   const renderPin = ({ item }) => {
+    if (!item) return null;
+    
     console.log('Pin being rendered:', item.title, 'ID:', item._id);
+    
     return (
-    <Card
-      style={[styles.pinCard, { width: pinWidth }]}
-      onPress={() => {
-        console.log('Navigating to pin detail with ID:', item._id);
-        navigation.navigate('PinDetail', { pinId: item._id });
-      }}
-    >
-      <Card.Cover
-        source={{ uri: item.imageUrl }}
-        style={styles.pinImage}
-        resizeMode="cover"
-        onError={(e) => {
-          console.error('Image loading error:', e.nativeEvent.error);
-          console.log('Failed URL:', item.imageUrl);
-        }}
-      />
-      <View style={styles.pinTitle}>
-        <Text numberOfLines={2} style={{ fontSize: 16, fontWeight: 'bold' }}>{item.title}</Text>
-        <Text numberOfLines={1} style={{ fontSize: 14, color: '#666' }}>
-          {item.category ? `${item.category}` : 'Uncategorized'}
-          {item.user && item.user.username && ` • ${item.user.username}`}
-        </Text>
+      <View style={[styles.pinContainer, { width: pinWidth }]}>
+        <TouchableOpacity 
+          activeOpacity={0.8}
+          onPress={() => {
+            console.log('Navigating to pin detail with ID:', item._id);
+            navigation.navigate('PinDetail', { pinId: item._id });
+          }}
+        >
+          <View style={styles.pinCard}>
+            <View style={{ width: '100%', aspectRatio: 1 }}>
+              <ImageWithLoading
+                source={item.imageUrl}
+                style={{ width: '100%', height: '100%' }}
+                onError={(error) => {
+                  console.error('Image loading error:', error);
+                  console.log('Failed URL:', item.imageUrl);
+                }}
+              />
+            </View>
+            <View style={styles.pinTitle}>
+              <Text style={styles.pinTitleText} numberOfLines={2}>
+                {item.title || 'Untitled Pin'}
+              </Text>
+              <Text style={styles.pinSubtitle} numberOfLines={1}>
+                {item.category ? `${item.category}` : 'Uncategorized'}
+                {item.user?.username && ` • ${item.user.username}`}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
       </View>
-    </Card>
-  );
+    );
   };
 
   if (loading) {
@@ -204,37 +215,16 @@ const HomeScreen = () => {
         />
       </View>
 
-      {/* Render different FlatList components based on grid size */}
-      {gridSize === 'small' && (
-        <FlatList
-          data={filteredPins}
-          renderItem={renderPin}
-          keyExtractor={(item) => item._id}
-          numColumns={GRID_CONFIGS.small.numColumns}
-          contentContainerStyle={styles.pinGrid}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
-      {gridSize === 'medium' && (
-        <FlatList
-          data={filteredPins}
-          renderItem={renderPin}
-          keyExtractor={(item) => item._id}
-          numColumns={GRID_CONFIGS.medium.numColumns}
-          contentContainerStyle={styles.pinGrid}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
-      {gridSize === 'large' && (
-        <FlatList
-          data={filteredPins}
-          renderItem={renderPin}
-          keyExtractor={(item) => item._id}
-          numColumns={GRID_CONFIGS.large.numColumns}
-          contentContainerStyle={styles.pinGrid}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
+      {/* Single FlatList with dynamic configuration */}
+      <FlatList
+        data={filteredPins}
+        renderItem={renderPin}
+        keyExtractor={(item) => item._id}
+        numColumns={GRID_CONFIGS[gridSize]?.numColumns || 2}
+        contentContainerStyle={styles.pinGrid}
+        showsVerticalScrollIndicator={false}
+        key={`flatlist-${gridSize}`} // Force re-render when grid size changes
+      />
       <FAB
         icon={({ size, color }) => (
           <MaterialCommunityIcons name="plus" size={size} color={color} />
@@ -251,6 +241,12 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 8,
+  },
+  pinContainer: {
+    margin: 4,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
@@ -286,16 +282,31 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   pinCard: {
-    marginBottom: 16,
-    marginRight: 16,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    overflow: 'hidden',
     elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
   },
   pinImage: {
-    aspectRatio: 1, // This maintains the aspect ratio regardless of width
-    backgroundColor: '#f0f0f0',  
+    width: '100%',
+    aspectRatio: 1,
+    backgroundColor: '#f5f5f5',
   },
   pinTitle: {
-    padding: 8,
+    padding: 12,
+  },
+  pinTitleText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  pinSubtitle: {
+    fontSize: 12,
+    color: '#666',
   },
   fab: {
     position: 'absolute',
