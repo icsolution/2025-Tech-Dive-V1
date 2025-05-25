@@ -263,6 +263,17 @@ const generateMockData = async () => {
         randomSaves.push(randomUser._id);
       }
       
+      // Generate random likes (1-10 random users who liked this pin)
+      const numLikes = Math.floor(Math.random() * 10) + 1;
+      const randomLikes = [];
+      for (let j = 0; j < numLikes; j++) {
+        const randomUser = users[Math.floor(Math.random() * users.length)];
+        // Ensure we don't add duplicate user likes
+        if (!randomLikes.some(id => id.toString() === randomUser._id.toString())) {
+          randomLikes.push(randomUser._id);
+        }
+      }
+
       const pin = await Pin.create({
         title: `Amazing ${randomCategory} ${i + 1}`,
         description: `This is a detailed description for an amazing ${randomCategory.toLowerCase()} pin. It includes various aspects and details about the subject matter, making it informative and engaging for viewers.`,
@@ -272,8 +283,8 @@ const generateMockData = async () => {
         user: randomUser._id,
         board: randomBoard._id,
         comments: generateComments(users),
-        likes: Math.floor(Math.random() * 100),
-        saves: randomSaves // Now this is an array of user IDs
+        likes: randomLikes, // Array of user IDs who liked the pin
+        saves: randomSaves  // Array of user IDs who saved the pin
       });
 
       pins.push(pin);

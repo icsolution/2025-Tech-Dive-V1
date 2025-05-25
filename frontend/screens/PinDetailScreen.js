@@ -8,6 +8,7 @@ import {
   Share,
   TouchableOpacity,
   Linking,
+  Alert,
 } from 'react-native';
 import ImageWithLoading from '../components/ImageWithLoading';
 import {
@@ -29,9 +30,11 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Clipboard from 'expo-clipboard';
-import { getCurrentUser } from '../data/dummyData'; // Keep this for now until we have auth context
+// Import auth context instead of dummy data
+import { useAuth } from '../context/AuthContext';
 import { usePins } from '../context/PinsContext';
 import { useSettings } from '../context/SettingsContext';
+import { isValidObjectId, formatObjectId } from '../utils/mongoUtils';
 import config from '../config';
 
 const { width } = Dimensions.get('window');
@@ -42,6 +45,14 @@ const PinDetailScreen = () => {
   const route = useRoute();
   const { pinId } = route.params;
   console.log('Pin ID from route params:', pinId);
+  
+  // Use the auth context to get the current user and auth state
+  const { 
+    user: currentUser, 
+    loading: authLoading, 
+    authInitialized,
+    refreshAuth 
+  } = useAuth();
   
   // Use the pins context
   const { 
@@ -63,7 +74,6 @@ const PinDetailScreen = () => {
   const [commentDialogVisible, setCommentDialogVisible] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
-  const currentUser = getCurrentUser();
   const { settings } = useSettings();
   const { darkMode } = settings;
 
@@ -72,8 +82,13 @@ const PinDetailScreen = () => {
       setLoading(true);
       console.log('Fetching pin details for ID:', pinId);
       
-      // Make a direct API call to get the pin details from the database
-      const token = await AsyncStorage.getItem('token');
+      // Validate pinId first
+      if (!pinId || !isValidObjectId(pinId)) {
+        console.error('Invalid pin ID format:', pinId);
+        Alert.alert('Error', 'Invalid pin ID format');
+        navigation.goBack();
+        return;
+      }
       
       // Find the pin in the context first if available
       const contextPin = pins.find(p => p._id === pinId);
@@ -89,8 +104,16 @@ const PinDetailScreen = () => {
         };
         
         setPin(processedPin);
-        setIsLiked(processedPin.likes.includes(currentUser._id));
-        setIsSaved(processedPin.saves.includes(currentUser._id));
+        
+        // Check if user is logged in before setting like/save status
+        if (currentUser && currentUser._id) {
+          const userId = formatObjectId(currentUser._id);
+          if (userId) {
+            setIsLiked(processedPin.likes.some(id => formatObjectId(id) === userId));
+            setIsSaved(processedPin.saves.some(id => formatObjectId(id) === userId));
+          }
+        }
+        
         setComments(contextPin.comments || []);
         setLoading(false);
         setRefreshing(false);
@@ -99,40 +122,77 @@ const PinDetailScreen = () => {
       
       // If not in context, fetch from API
       console.log('Fetching pin from API:', pinId);
-      const response = await fetch(`${config.API_URL}/pins/${pinId}`, {
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
+      
+      try {
+        // Get authentication token
+        const token = await AsyncStorage.getItem('token');
+        
+        const response = await fetch(`${config.API_URL}/pins/${pinId}`, {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+          }
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('API error response:', {
+            status: response.status,
+            statusText: response.statusText,
+            data: errorData
+          });
+          
+          throw new Error(`Failed to fetch pin: ${response.status}`);
         }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch pin: ${response.status}`);
-      }
-      
-      const foundPin = await response.json();
-      if (!foundPin) {
-        throw new Error('Pin not found');
-      }
+        
+        const foundPin = await response.json();
+        if (!foundPin) {
+          throw new Error('Pin not found');
+        }
 
-      console.log('Found pin from API:', foundPin.title);
-      
-      // Ensure pin has all required properties with proper types
-      const processedPin = {
-        ...foundPin,
-        likes: Array.isArray(foundPin.likes) ? foundPin.likes : [],
-        saves: Array.isArray(foundPin.saves) ? foundPin.saves : [],
-        comments: Array.isArray(foundPin.comments) ? foundPin.comments : [],
-        tags: Array.isArray(foundPin.tags) ? foundPin.tags : []
-      };
-      
-      setPin(processedPin);
-      setIsLiked(processedPin.likes.includes(currentUser._id));
-      setIsSaved(processedPin.saves.includes(currentUser._id));
-      setComments(foundPin.comments || []);
+        console.log('Found pin from API:', foundPin.title);
+        
+        // Ensure pin has all required properties with proper types
+        const processedPin = {
+          ...foundPin,
+          likes: Array.isArray(foundPin.likes) ? foundPin.likes : [],
+          saves: Array.isArray(foundPin.saves) ? foundPin.saves : [],
+          comments: Array.isArray(foundPin.comments) ? foundPin.comments : [],
+          tags: Array.isArray(foundPin.tags) ? foundPin.tags : []
+        };
+        
+        setPin(processedPin);
+        
+        // Check if user is logged in before setting like/save status
+        if (currentUser && currentUser._id) {
+          const userId = formatObjectId(currentUser._id);
+          if (userId) {
+            setIsLiked(processedPin.likes.some(id => formatObjectId(id) === userId));
+            setIsSaved(processedPin.saves.some(id => formatObjectId(id) === userId));
+          }
+        }
+        
+        setComments(foundPin.comments || []);
+      } catch (apiError) {
+        console.error('API fetch error:', apiError);
+        throw apiError; // Re-throw to be caught by the outer catch
+      }
     } catch (error) {
       console.error('Error fetching pin details:', error);
-      // Show error state in the UI
-      navigation.goBack(); // Return to previous screen on error
+      
+      // Show appropriate error message based on the error
+      let errorMessage = 'Failed to load pin details';
+      
+      if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Network error. Please check your connection.';
+      } else if (error.message.includes('Pin not found')) {
+        errorMessage = 'This pin no longer exists.';
+      } else if (error.message.includes('401')) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      }
+      
+      Alert.alert('Error', errorMessage, [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -141,14 +201,39 @@ const PinDetailScreen = () => {
 
   useEffect(() => {
     console.log('PinDetailScreen useEffect triggered with pinId:', pinId);
-    if (pinId) {
-      fetchPinDetails();
-    } else {
+    
+    // Check if we have a valid pinId
+    if (!pinId) {
       console.error('No pinId provided to PinDetailScreen');
       setLoading(false);
       navigation.goBack();
+      return;
     }
-  }, [pinId]);
+    
+    // If auth is still initializing, wait for it
+    if (!authInitialized) {
+      console.log('Auth not yet initialized, waiting...');
+      return;
+    }
+    
+    // If auth is loading, wait for it
+    if (authLoading) {
+      console.log('Auth is loading, waiting...');
+      return;
+    }
+    
+    // Check if we need to refresh auth
+    if (!currentUser) {
+      console.log('No current user, attempting to refresh auth state...');
+      refreshAuth().then(() => {
+        console.log('Auth refreshed, fetching pin details');
+        fetchPinDetails();
+      });
+    } else {
+      console.log('User authenticated, fetching pin details');
+      fetchPinDetails();
+    }
+  }, [pinId, authInitialized, authLoading, currentUser]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -159,21 +244,147 @@ const PinDetailScreen = () => {
     try {
       console.log('Starting handleLike with pinId:', pinId);
       
-      // Ensure pinId is a valid value
-      if (!pinId) {
-        console.error('Invalid pinId:', pinId);
+      // Validate pinId
+      if (!pinId || !isValidObjectId(pinId)) {
+        console.error('Invalid pinId format:', pinId);
+        Alert.alert('Error', 'Cannot like: Invalid pin ID format');
         return;
       }
       
-      // Use the context function to toggle like
-      const updatedPin = await toggleLike(pinId, currentUser._id);
-      if (updatedPin) {
-        setPin(updatedPin);
-        setIsLiked(!isLiked);
-        console.log('Pin like state updated successfully');
+      // Check if user is authenticated
+      if (authLoading) {
+        console.log('Auth is still loading, waiting...');
+        return; // Wait for auth to load
+      }
+      
+      // Validate user is logged in
+      if (!currentUser) {
+        console.error('No current user found - not logged in');
+        Alert.alert(
+          'Authentication Required',
+          'Please log in to like pins',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { 
+              text: 'Log In', 
+              onPress: () => navigation.navigate('Login') 
+            }
+          ]
+        );
+        return;
+      }
+      
+      // Validate user ID exists
+      if (!currentUser._id) {
+        console.error('User is logged in but has no ID');
+        Alert.alert('Error', 'User account is invalid. Please log out and log in again.');
+        return;
+      }
+      
+      // Format the user ID to ensure it's a valid ObjectId string
+      const formattedUserId = formatObjectId(currentUser._id);
+      if (!formattedUserId) {
+        console.error('Invalid user ID format:', currentUser._id);
+        Alert.alert(
+          'Error',
+          'Your user ID is in an invalid format. Please log out and log in again.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { 
+              text: 'Log Out', 
+              onPress: async () => {
+                try {
+                  await AsyncStorage.removeItem('token');
+                  navigation.navigate('Login');
+                } catch (error) {
+                  console.error('Failed to clear token:', error);
+                }
+              } 
+            }
+          ]
+        );
+        return;
+      }
+      
+      // Get current like state before optimistic update
+      const wasLiked = isLiked;
+      console.log('Current like state:', wasLiked ? 'Liked' : 'Not liked');
+      
+      // Apply optimistic update for better UX
+      setIsLiked(!wasLiked);
+      
+      try {
+        console.log('Calling toggleLike with pinId:', pinId, 'and userId:', formattedUserId);
+        
+        // Use the context function to toggle like with the formatted user ID
+        const updatedPin = await toggleLike(pinId, formattedUserId);
+        
+        if (updatedPin) {
+          console.log('Pin updated successfully:', {
+            id: updatedPin._id,
+            likes: updatedPin.likes?.length || 0,
+            isLiked: updatedPin.likes?.some(id => formatObjectId(id) === formattedUserId)
+          });
+          
+          // Update the pin data with server response
+          setPin(updatedPin);
+          
+          // Ensure the like state matches the server state
+          const serverLikeState = updatedPin.likes?.some(id => 
+            formatObjectId(id) === formattedUserId
+          );
+          
+          if (serverLikeState !== !wasLiked) {
+            console.log('Correcting like state to match server:', serverLikeState);
+            setIsLiked(serverLikeState);
+          }
+        }
+      } catch (error) {
+        // Revert optimistic update on error
+        console.error('Error toggling like:', error);
+        setIsLiked(wasLiked);
+        
+        // Show appropriate error message based on error type
+        if (error.message?.includes('User not found')) {
+          Alert.alert(
+            'Authentication Error',
+            'Your session has expired. Please log in again.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { 
+                text: 'Log In', 
+                onPress: async () => {
+                  await AsyncStorage.removeItem('token');
+                  navigation.navigate('Login');
+                }
+              }
+            ]
+          );
+        } else if (error.message?.includes('Pin not found')) {
+          Alert.alert('Error', 'This pin no longer exists.');
+          navigation.goBack();
+        } else if (error.message?.includes('Invalid user ID format')) {
+          Alert.alert(
+            'Authentication Error',
+            'Your user ID is invalid. Please log in again.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { 
+                text: 'Log In', 
+                onPress: async () => {
+                  await AsyncStorage.removeItem('token');
+                  navigation.navigate('Login');
+                }
+              }
+            ]
+          );
+        } else {
+          Alert.alert('Error', `Failed to ${wasLiked ? 'unlike' : 'like'} pin. Please try again.`);
+        }
       }
     } catch (error) {
-      console.error('Error liking pin:', error);
+      console.error('Unexpected error in handleLike:', error);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     }
   };
 

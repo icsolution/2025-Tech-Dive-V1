@@ -49,30 +49,51 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   try {
+    console.log('=== LOGIN ATTEMPT ===');
     console.log('Login request received:', {
-      body: req.body,
+      body: { ...req.body, password: '[REDACTED]' }, // Don't log actual password
       headers: req.headers
     });
+    
     const { email, password } = req.body;
-
-    // Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      console.log('User not found:', email);
-      return res.status(400).json({ message: 'User not found' });
+    
+    if (!email || !password) {
+      console.error('Missing email or password');
+      return res.status(400).json({ 
+        success: false,
+        message: 'Email and password are required' 
+      });
     }
 
-    console.log('Found user:', user.username, 'with email:', user.email);
-    console.log('Stored password hash:', user.password);
-    console.log('Attempting to match with password:', password);
+    // Check if user exists
+    console.log('Looking up user with email:', email);
+    const user = await User.findOne({ email });
+    if (!user) {
+      console.error('User not found for email:', email);
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid email or password' 
+      });
+    }
+
+    console.log('Found user:', {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      hasPassword: !!user.password
+    });
 
     // Check password
+    console.log('Verifying password...');
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password match result:', isMatch);
+    console.log('Password verification result:', isMatch);
     
     if (!isMatch) {
-      console.log('Password does not match');
-      return res.status(400).json({ message: 'Invalid password' });
+      console.error('Invalid password for user:', user.email);
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid email or password' 
+      });
     }
 
     // Create token

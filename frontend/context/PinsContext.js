@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isValidObjectId, formatObjectId } from '../utils/mongoUtils';
 import config from '../config';
 
 // Create the context
@@ -121,72 +122,149 @@ export const PinsProvider = ({ children }) => {
 
   // Toggle like on a pin
   const toggleLike = async (pinId, userId) => {
+    let originalPin;
+    let isLiked;
+    
     try {
-      console.log('Toggling like for pin:', pinId, 'by user:', userId);
+      console.log('[toggleLike] Starting for pin:', pinId, 'by user:', userId);
       
       // Validate inputs
-      if (!pinId || !userId) {
-        console.error('Invalid pinId or userId:', { pinId, userId });
-        return null;
+      if (!pinId) {
+        const error = new Error('Invalid pin ID');
+        error.details = { pinId };
+        throw error;
       }
 
-      const pin = pins.find(pin => pin._id === pinId);
-      if (!pin) {
-        console.error('Pin not found with ID:', pinId);
-        return null;
+      if (!userId) {
+        const error = new Error('Invalid user ID');
+        error.details = { userId };
+        throw error;
+      }
+
+      // Find the pin in our local state
+      originalPin = pins.find(pin => pin._id === pinId);
+      if (!originalPin) {
+        console.log('[toggleLike] Pin not found in local state, will try fetching from API');
+        try {
+          // Try to fetch the pin from the API
+          const token = await AsyncStorage.getItem('token');
+          const response = await fetch(`${config.API_URL}/pins/${pinId}`, {
+            headers: {
+              'Authorization': token ? `Bearer ${token}` : '',
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Pin not found: ${response.status}`);
+          }
+          
+          originalPin = await response.json();
+          console.log('[toggleLike] Retrieved pin from API:', originalPin.title);
+        } catch (fetchError) {
+          console.error('[toggleLike] Failed to fetch pin:', fetchError);
+          const error = new Error('Pin not found');
+          error.details = { pinId, originalError: fetchError.message };
+          throw error;
+        }
       }
 
       // Ensure likes is an array
-      const pinLikes = Array.isArray(pin.likes) ? pin.likes : [];
-      const isLiked = pinLikes.includes(userId);
+      const pinLikes = Array.isArray(originalPin.likes) ? originalPin.likes : [];
+      isLiked = pinLikes.some(id => id && id.toString() === userId.toString());
       
-      console.log('Current like status:', isLiked ? 'Liked' : 'Not liked');
+      console.log('[toggleLike] Current like status:', isLiked ? 'Liked' : 'Not liked');
       
-      // Update locally first for immediate UI feedback
+      // Update locally first for immediate UI feedback (optimistic update)
       const updatedLikes = isLiked
-        ? pinLikes.filter(id => id !== userId)
+        ? pinLikes.filter(id => id && id.toString() !== userId.toString())
         : [...pinLikes, userId];
       
-      const updatedPin = {
-        ...pin,
+      const optimisticPin = {
+        ...originalPin,
         likes: updatedLikes
       };
       
+      // Update the pins state with our optimistic update
       setPins(prevPins => 
-        prevPins.map(p => p._id === pinId ? updatedPin : p)
+        prevPins.map(p => p._id === pinId ? optimisticPin : p)
       );
       
       // Then update on the server
       const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
       
-      // Connect to the updated backend API
+      console.log('[toggleLike] Sending request to API:', `${config.API_URL}/pins/${pinId}/like`);
+      
+      // Validate and format the userId to ensure it's a valid ObjectId string
+      const formattedUserId = formatObjectId(userId);
+      if (!formattedUserId) {
+        console.error('[toggleLike] Invalid userId format:', userId);
+        throw new Error('Invalid user ID format');
+      }
+      
+      // Validate pinId as well
+      if (!isValidObjectId(pinId)) {
+        console.error('[toggleLike] Invalid pinId format:', pinId);
+        throw new Error('Invalid pin ID format');
+      }
+      
+      console.log('[toggleLike] Using formatted IDs:', { 
+        pinId, 
+        userId: formattedUserId 
+      });
+      
       const response = await fetch(`${config.API_URL}/pins/${pinId}/like`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ 
-          userId, 
+          userId: formattedUserId, // Send the formatted ID
           action: isLiked ? 'unlike' : 'like' 
         })
       });
       
+      // Always parse the response, even if it's an error
+      const responseData = await response.json();
+      
       if (!response.ok) {
+        console.error('[toggleLike] Server response error:', response.status, responseData);
         // Revert local state if server update fails
         setPins(prevPins => 
-          prevPins.map(p => p._id === pinId ? pin : p)
+          prevPins.map(p => p._id === pinId ? originalPin : p)
         );
-        throw new Error(`Failed to update like status: ${response.status}`);
+        
+        // Throw appropriate error based on response
+        if (response.status === 401) {
+          throw new Error('Authentication required');
+        } else if (response.status === 404) {
+          throw new Error('Pin or user not found');
+        } else {
+          throw new Error(`Failed to update like status: ${response.status}`);
+        }
       }
       
-      const serverUpdatedPin = await response.json();
-      return serverUpdatedPin;
+      console.log('[toggleLike] Like update successful:', responseData);
+      
+      // Update pins state with the server response to ensure consistency
+      if (responseData.data) {
+        setPins(prevPins => 
+          prevPins.map(p => p._id === pinId ? responseData.data : p)
+        );
+      }
+      
+      return responseData.data || optimisticPin;
     } catch (error) {
-      console.error('Error toggling like:', error);
-      // Return the locally updated pin as fallback if server update fails
-      // Make sure updatedPin is defined before returning it
-      return updatedPin || null;
+      console.error('[toggleLike] Error:', {
+        message: error.message,
+        details: error.details || {},
+        stack: error.stack
+      });
+      // Re-throw the error to be handled by the component
+      throw error;
     }
   };
 

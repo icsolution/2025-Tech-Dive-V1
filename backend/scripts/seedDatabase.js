@@ -1049,10 +1049,22 @@ async function seedDatabase() {
       const deviceTypes = getRandomDeviceTypesCount(views);
       const locations = getRandomLocations(views);
 
+      // Generate random likes (0-10 random users who liked this pin)
+      const numLikes = Math.floor(Math.random() * 11); // 0-10 likes
+      const randomLikes = [];
+      const potentialLikers = [...createdUsers];
+      
+      for (let i = 0; i < numLikes && i < potentialLikers.length; i++) {
+        const randomIndex = Math.floor(Math.random() * potentialLikers.length);
+        const randomUser = potentialLikers.splice(randomIndex, 1)[0];
+        randomLikes.push(randomUser._id);
+      }
+
       const createdPin = await Pin.create({
         ...pin,
         user: user._id,
         board: board ? board._id : null,
+        likes: randomLikes, // Array of user IDs who liked the pin
         views,
         // Use savesCount for the analytics.saves field instead of directly assigning to saves array
         analytics: {
