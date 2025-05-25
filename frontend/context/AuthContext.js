@@ -54,6 +54,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
       setAuthInitialized(true);
       console.log('Auth check completed, initialized:', true);
+      console.log('Final user state after checkAuth:', user);
     }
   };
 
@@ -66,6 +67,7 @@ export const AuthProvider = ({ children }) => {
       await AsyncStorage.removeItem('token');
       
       const response = await authAPI.login(credentials);
+      console.log('Response from authAPI.login:', response);
       
       if (!response || !response.token || !response.user) {
         console.error('Invalid login response:', response);
@@ -83,6 +85,7 @@ export const AuthProvider = ({ children }) => {
       console.log('Login successful, storing token and user data');
       await AsyncStorage.setItem('token', token);
       setUser(user);
+      console.log('User state after login:', user);
       
       return user;
     } catch (error) {

@@ -4,14 +4,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const API_URL = config.API_URL;
 
 // Helper function to get auth token
-const getAuthToken = async () => {
+export const getAuthToken = async () => {
   const token = await AsyncStorage.getItem('token');
   console.log('Retrieved token:', token ? 'Token exists' : 'No token found');
   return token;
 };
 
 // Helper function to handle API responses
-const handleResponse = async (response) => {
+export const handleResponse = async (response) => {
   if (!response.ok) {
     const errorData = await response.json();
     console.error('API Error Response:', {
@@ -202,39 +202,6 @@ export const pinsAPI = {
     });
     return handleResponse(response);
   },
-
-  updatePin: async (pinId, pinData) => {
-    const token = await getAuthToken();
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-    
-    const response = await fetch(`${API_URL}/pins/${pinId}`, {
-      method: 'PUT',
-      headers: {
-        'x-auth-token': token,
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(pinData),
-    });
-    return handleResponse(response);
-  },
-
-  deletePin: async (pinId) => {
-    const token = await getAuthToken();
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-    
-    const response = await fetch(`${API_URL}/pins/${pinId}`, {
-      method: 'DELETE',
-      headers: {
-        'x-auth-token': token,
-        'Accept': 'application/json'
-      },
-    });
-    return handleResponse(response);
-  },
 };
 
 // Boards API
@@ -281,6 +248,7 @@ export const boardsAPI = {
     const response = await fetch(`${API_URL}/boards`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'x-auth-token': token,
         'Accept': 'application/json'
       },
@@ -298,6 +266,7 @@ export const boardsAPI = {
     const response = await fetch(`${API_URL}/boards/${boardId}`, {
       method: 'PUT',
       headers: {
+        'Content-Type': 'application/json',
         'x-auth-token': token,
         'Accept': 'application/json'
       },
@@ -321,32 +290,166 @@ export const boardsAPI = {
     });
     return handleResponse(response);
   },
-};
 
-// Feed API
-export const getFeed = async (page = 1, limit = 20) => {
-  try {
-    const token = await AsyncStorage.getItem('token');
+  getBoardsByUserId: async (userId) => {
+    const token = await getAuthToken();
     if (!token) {
       throw new Error('No authentication token found');
     }
-
-    const response = await fetch(`${config.API_URL}/pins?page=${page}&limit=${limit}`, {
+    const response = await fetch(`${API_URL}/boards/user/${userId}`, {
       headers: {
         'x-auth-token': token,
-        'Accept': 'application/json',
+        'Accept': 'application/json'
       },
     });
+    return handleResponse(response);
+  },
+};
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+// Feed API
+export const feedAPI = {
+  getFeed: async (page = 1, limit = 10) => {
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
     }
+    
+    const response = await fetch(
+      `${API_URL}/feed?page=${page}&limit=${limit}`,
+      {
+        headers: {
+          'x-auth-token': token,
+          'Accept': 'application/json'
+        },
+      }
+    );
+    return handleResponse(response);
+  },
+};
 
-    const data = await response.json();
-    return data.pins; // Return just the pins array
-  } catch (error) {
-    console.error('Error fetching feed:', error);
-    throw error;
-  }
-}; 
+// Search API
+export const searchAPI = {
+  search: async (query) => {
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const response = await fetch(`${API_URL}/search?q=${query}`, {
+      headers: {
+        'x-auth-token': token,
+        'Accept': 'application/json'
+      },
+    });
+    return handleResponse(response);
+  },
+};
+
+// Comments API
+export const commentsAPI = {
+  addComment: async (pinId, text) => {
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const response = await fetch(`${API_URL}/pins/${pinId}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': token,
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ text }),
+    });
+    return handleResponse(response);
+  },
+};
+
+// User API
+export const userAPI = {
+  getUserProfile: async (userId) => {
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const response = await fetch(`${API_URL}/users/${userId}`, {
+      headers: {
+        'x-auth-token': token,
+        'Accept': 'application/json'
+      },
+    });
+    return handleResponse(response);
+  },
+};
+
+// Notifications API
+export const notificationsAPI = {
+  getNotifications: async () => {
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const response = await fetch(`${API_URL}/notifications`, {
+      headers: {
+        'x-auth-token': token,
+        'Accept': 'application/json'
+      },
+    });
+    return handleResponse(response);
+  },
+};
+
+// Analytics API
+export const analyticsAPI = {
+  getAnalytics: async () => {
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const response = await fetch(`${API_URL}/analytics`, {
+      headers: {
+        'x-auth-token': token,
+        'Accept': 'application/json'
+      },
+    });
+    return handleResponse(response);
+  },
+};
+
+// Settings API
+export const settingsAPI = {
+  getSettings: async () => {
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const response = await fetch(`${API_URL}/settings`, {
+      headers: {
+        'x-auth-token': token,
+        'Accept': 'application/json'
+      },
+    });
+    return handleResponse(response);
+  },
+};
+
+// Export all APIs as a single object
+export default {
+  getAuthToken,
+  handleResponse,
+  authAPI,
+  pinsAPI,
+  boardsAPI,
+  feedAPI,
+  searchAPI,
+  commentsAPI,
+  userAPI,
+  notificationsAPI,
+  analyticsAPI,
+  settingsAPI,
+};

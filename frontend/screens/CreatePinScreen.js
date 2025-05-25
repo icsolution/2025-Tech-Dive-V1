@@ -16,6 +16,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getCurrentUser, dummyBoards } from '../data/dummyData';
 import { useSettings } from '../context/SettingsContext';
+import { useAuth } from '../context/AuthContext';
+import * as api from '../services/api';
 
 const CreatePinScreen = () => {
   const navigation = useNavigation();
@@ -34,6 +36,8 @@ const CreatePinScreen = () => {
   const [selectBoardModalVisible, setSelectBoardModalVisible] = useState(false);
   const { settings } = useSettings();
   const { darkMode } = settings;
+  const { user } = useAuth();
+  console.log('User object in CreatePinScreen:', user);
 
   useEffect(() => {
     fetchBoards();
@@ -43,19 +47,18 @@ const CreatePinScreen = () => {
   }, [initialBoardId]);
 
   const fetchBoards = async () => {
+    console.log('User object in fetchBoards:', user);
     try {
-      const currentUser = getCurrentUser();
-      const userBoards = dummyBoards.filter(board => board.author._id === currentUser._id);
-      console.log('Fetched boards:', userBoards);
-      
-      if (!userBoards || userBoards.length === 0) {
-        console.log('No boards found. User needs to create a board first.');
-        setError('Please create a board first before creating a pin');
-      } else {
-        setBoards(userBoards);
+      if (!user) {
+        setError('User not authenticated. Cannot fetch boards.');
+        return;
       }
+      const userBoards = await api.boardsAPI.getBoardsByUserId(user._id);
+      console.log('Fetched boards:', userBoards);
+      setBoards(userBoards);
     } catch (error) {
       console.error('Error fetching boards:', error);
+      console.error('Error fetching boards details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
       setError('Failed to load boards. Please try again.');
     }
   };
@@ -137,37 +140,23 @@ const CreatePinScreen = () => {
     setError('');
 
     try {
-      const currentUser = getCurrentUser();
-      const selectedBoard = dummyBoards.find(board => board._id === formData.boardId);
-      
-      if (!selectedBoard) {
-        throw new Error('Selected board not found');
-      }
-
-      const newPin = {
-        _id: `pin_${Date.now()}`,
+      const pinData = {
         title: formData.title,
         description: formData.description,
         imageUrl: formData.imageUrl,
-        author: currentUser,
-        board: selectedBoard,
-        likes: [],
-        saves: [],
-        comments: [],
-        createdAt: new Date().toISOString(),
-        isLiked: false,
-        isSaved: false,
+        boardId: formData.boardId,
+        userId: user._id,
+        category: 'Other',
       };
 
-      console.log('Created dummy pin:', newPin);
-      
-      selectedBoard.pins.push(newPin);
+      const response = await api.pinsAPI.createPin(pinData);
+      console.log('Pin created successfully:', response);
       
       navigation.goBack();
-
       setModalVisible(false);
     } catch (error) {
       console.error('Error creating pin:', error);
+      console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
       setError(error.message || 'Failed to create pin. Please try again.');
     } finally {
       setLoading(false);
@@ -512,4 +501,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreatePinScreen; 
+export default CreatePinScreen;
