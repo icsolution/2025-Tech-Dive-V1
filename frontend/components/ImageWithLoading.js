@@ -42,10 +42,9 @@ const ImageWithLoading = ({
     <View style={[styles.container, style]}>
       <Image
         source={{ uri: source }}
-        style={[styles.image, { width, height: '100%' }]}
+        style={[styles.image, { resizeMode: 'contain' }]}
         onLoadEnd={handleLoadEnd}
         onError={handleError}
-        resizeMode="cover"
         {...rest}
       />
       
@@ -67,6 +66,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
+    backgroundColor: 'transparent',
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,

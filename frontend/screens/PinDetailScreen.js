@@ -281,16 +281,17 @@ const PinDetailScreen = () => {
           />
         }
       >
-      <ImageWithLoading
-        source={pin.imageUrl}
-        style={styles.image}
-        width={width}
-        quality={90}
-        onError={(error) => {
-          console.error('Image loading error:', error);
-          console.log('Failed URL:', pin.imageUrl);
-        }}
-      />
+      <View style={styles.imageContainer}>
+        <ImageWithLoading
+          source={pin.imageUrl}
+          style={styles.image}
+          resizeMode="contain"
+          onError={(error) => {
+            console.error('Image loading error:', error);
+            console.log('Failed URL:', pin.imageUrl);
+          }}
+        />
+      </View>
 
       <Surface style={[styles.content, { backgroundColor: darkMode ? '#444' : '#fff' }]}>
         {/* Header Actions */}
@@ -610,16 +611,18 @@ const styles = StyleSheet.create({
   divider: {
     marginVertical: 16,
   },
-  boardSection: {
-    flexDirection: 'row',
+  imageContainer: {
+    width: '100%',
+    backgroundColor: '#f8f8f8',
     alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
   },
   image: {
     width: '100%',
-    height: 400,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    backgroundColor: '#f5f5f5',
+    height: 500,
+    resizeMode: 'contain',
+    backgroundColor: 'transparent',
   },
   boardInfo: {
     flex: 1,

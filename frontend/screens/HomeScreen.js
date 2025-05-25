@@ -102,10 +102,11 @@ const HomeScreen = () => {
           }}
         >
           <View style={styles.pinCard}>
-            <View style={{ width: '100%', aspectRatio: 1 }}>
+            <View style={styles.imageContainer}>
               <ImageWithLoading
                 source={item.imageUrl}
-                style={{ width: '100%', height: '100%' }}
+                resizeMode="cover"
+                style={styles.pinImage}
                 onError={(error) => {
                   console.error('Image loading error:', error);
                   console.log('Failed URL:', item.imageUrl);
@@ -290,6 +291,22 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
+    height: 300, // Fixed height for consistency
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  imageContainer: {
+    flex: 1,
+    backgroundColor: '#f8f8f8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    padding: 8,
+  },
+  pinTitle: {
+    padding: 12,
+    backgroundColor: 'white',
   },
   pinImage: {
     width: '100%',
