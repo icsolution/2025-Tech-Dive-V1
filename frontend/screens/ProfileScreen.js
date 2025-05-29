@@ -33,6 +33,7 @@ const numColumns = 3;
 const pinSize = width / numColumns - 8;
 
 const ProfileScreen = () => {
+  console.log('ProfileScreen component rendered');
   const theme = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
@@ -75,6 +76,42 @@ const ProfileScreen = () => {
     }
   };
 
+  const fetchUserBoards = async (userId) => {
+    console.log('fetchUserBoards called with userId:', userId); // Log function call
+    if (!userId) {
+      console.log('userId is undefined or null, returning.');
+      return;
+    }
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        console.log('No token found, cannot fetch boards.');
+        return;
+      }
+      const apiUrl = `${config.API_URL}/boards/user/${userId}`;
+      console.log('Fetching boards from URL:', apiUrl); // Log API URL
+      const response = await fetch(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      });
+
+      console.log('Response status for boards:', response.status); // Log response status
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Failed to fetch user boards. Response:', errorText); // Log full error response
+        throw new Error(`Failed to fetch user boards: ${response.status} ${response.statusText}`);
+      }
+      const userBoardsData = await response.json();
+      console.log('Successfully fetched user boards:', userBoardsData); // Log fetched data
+      setUserBoards(userBoardsData);
+    } catch (error) {
+      console.error('Error in fetchUserBoards:', error); // More specific error log
+    }
+  };
+
   const fetchUserSavedPins = async (userId) => {
     if (!userId) return;
     try {
@@ -96,22 +133,34 @@ const ProfileScreen = () => {
   };
 
   useEffect(() => {
-    fetchUserProfile();
     const unsubscribe = navigation.addListener('refreshProfile', () => {
-      // When refreshProfile event is heard, re-fetch user profile and saved pins
+      // When refreshProfile event is heard, re-fetch user profile, saved pins, and boards
       fetchUserProfile();
-      // Only fetch saved pins if user data is already available
-      // This avoids issues if user is null during the initial fetchUserProfile
-      if (user && user._id) {
-        fetchUserSavedPins(user._id);
-      }
     });
+
+    // Initial fetch when component mounts or route params change
+    fetchUserProfile();
+
     return unsubscribe;
-  }, [navigation, route.params]);
+  }, [navigation, route.params]); // Removed 'user' from dependency array
 
   useEffect(() => {
-    if (user && selectedView === 'pins') {
-      fetchUserSavedPins(user._id);
+    if (user && user._id) {
+      if (selectedView === 'pins') {
+        fetchUserSavedPins(user._id);
+      } else if (selectedView === 'boards') {
+        fetchUserBoards(user._id);
+      }
+    }
+  }, [user, selectedView]); // This useEffect will handle fetching pins/boards when user state updates
+
+  useEffect(() => {
+    if (user) {
+      if (selectedView === 'pins') {
+        fetchUserSavedPins(user._id);
+      } else if (selectedView === 'boards') {
+        fetchUserBoards(user._id);
+      }
     }
   }, [user, selectedView]);
 
@@ -120,6 +169,7 @@ const ProfileScreen = () => {
     fetchUserProfile();
     if (user) {
       fetchUserSavedPins(user._id);
+      fetchUserBoards(user._id);
     }
   };
 

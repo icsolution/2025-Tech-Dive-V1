@@ -27,6 +27,7 @@ import {
   ActivityIndicator,
 } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useRef } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Clipboard from 'expo-clipboard';
@@ -40,6 +41,7 @@ import config from '../config';
 const { width } = Dimensions.get('window');
 
 const PinDetailScreen = () => {
+  const anchorRef = useRef(null);
   const theme = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
@@ -71,6 +73,7 @@ const PinDetailScreen = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [commentDialogVisible, setCommentDialogVisible] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
@@ -589,16 +592,27 @@ const PinDetailScreen = () => {
       <Surface style={[styles.content, { backgroundColor: darkMode ? '#444' : '#fff' }]}>
         {/* Header Actions */}
         <View style={styles.headerActions}>
-          <IconButton
-            icon={() => <MaterialCommunityIcons name="dots-horizontal" size={24} color={darkMode ? '#fff' : '#000'} />}
-            onPress={() => setMenuVisible(true)}
-          />
-          <Menu
-            visible={menuVisible}
-            onDismiss={() => setMenuVisible(false)}
-            anchor={<View />}
-            style={{ backgroundColor: darkMode ? '#333' : '#fff' }}
+          <View
+            ref={anchorRef}
+
           >
+            <IconButton
+              icon={() => <MaterialCommunityIcons name="dots-horizontal" size={24} color={darkMode ? '#fff' : '#000'} />}
+              onPress={() => {
+                anchorRef.current.measure((fx, fy, width, height, px, py) => {
+                  setMenuPosition({ x: px, y: py + height });
+                  setMenuVisible(true);
+                });
+              }}
+            />
+          </View>
+          {anchorRef.current && (
+            <Menu
+              visible={menuVisible}
+              onDismiss={() => setMenuVisible(false)}
+              anchor={{ x: menuPosition.x, y: menuPosition.y }}
+              style={{ backgroundColor: darkMode ? '#333' : '#fff' }}
+            >
             <Menu.Item 
               onPress={handleShare} 
               title="Share" 
@@ -617,7 +631,8 @@ const PinDetailScreen = () => {
               leadingIcon={() => <MaterialCommunityIcons name="flag" size={24} color={darkMode ? '#fff' : '#000'} />}
               titleStyle={{ color: darkMode ? '#fff' : '#000' }}
             />
-          </Menu>
+            </Menu>
+          )}
         </View>
 
         {/* Title and Description */}

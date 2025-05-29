@@ -72,6 +72,14 @@ const CreateBoardScreen = () => {
       const response = await api.boardsAPI.createBoard(boardData);
       console.log('Board created successfully:', response);
       
+      // Dispatch the refreshProfile event to trigger ProfileScreen refresh
+      navigation.dispatch({
+        type: 'NAVIGATE',
+        payload: {
+          name: 'refreshProfile',
+        },
+      });
+      
       // Navigate back or to board detail
       navigation.goBack();
     } catch (error) {
