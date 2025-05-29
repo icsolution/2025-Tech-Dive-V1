@@ -77,6 +77,7 @@ const ProfileScreen = () => {
   };
 
   const fetchUserBoards = async (userId) => {
+    console.log('Fetching boards for userId:', userId);
     console.log('fetchUserBoards called with userId:', userId); // Log function call
     if (!userId) {
       console.log('userId is undefined or null, returning.');
@@ -89,7 +90,7 @@ const ProfileScreen = () => {
         return;
       }
       const apiUrl = `${config.API_URL}/boards/user/${userId}`;
-      console.log('Fetching boards from URL:', apiUrl); // Log API URL
+      console.log('API URL:', apiUrl); // Log API URL
       const response = await fetch(apiUrl, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -97,7 +98,7 @@ const ProfileScreen = () => {
         cache: 'no-store',
       });
 
-      console.log('Response status for boards:', response.status); // Log response status
+      console.log('Response Status:', response.status); // Log response status
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -105,7 +106,7 @@ const ProfileScreen = () => {
         throw new Error(`Failed to fetch user boards: ${response.status} ${response.statusText}`);
       }
       const userBoardsData = await response.json();
-      console.log('Successfully fetched user boards:', userBoardsData); // Log fetched data
+      console.log('Fetched boards data:', userBoardsData); // Log fetched data
       setUserBoards(userBoardsData);
     } catch (error) {
       console.error('Error in fetchUserBoards:', error); // More specific error log
@@ -133,18 +134,13 @@ const ProfileScreen = () => {
   };
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('refreshProfile', () => {
-      // When refreshProfile event is heard, re-fetch user profile, saved pins, and boards
-      fetchUserProfile();
-    });
-
     // Initial fetch when component mounts or route params change
     fetchUserProfile();
-
-    return unsubscribe;
-  }, [navigation, route.params]); // Removed 'user' from dependency array
+  }, [navigation, route.params]);
 
   useEffect(() => {
+    console.log('Current selectedView:', selectedView);
+    console.log('Current userBoards state:', userBoards);
     if (user && user._id) {
       if (selectedView === 'pins') {
         fetchUserSavedPins(user._id);
@@ -152,17 +148,16 @@ const ProfileScreen = () => {
         fetchUserBoards(user._id);
       }
     }
-  }, [user, selectedView]); // This useEffect will handle fetching pins/boards when user state updates
+  }, [user, selectedView]);
 
   useEffect(() => {
-    if (user) {
-      if (selectedView === 'pins') {
-        fetchUserSavedPins(user._id);
-      } else if (selectedView === 'boards') {
-        fetchUserBoards(user._id);
-      }
+    if (route.params?.refresh) {
+      console.log('Refreshing ProfileScreen due to navigation parameter.');
+      fetchUserProfile();
+      // Assuming user and selectedView are already set, these will trigger the other useEffect
+      // to fetch pins/boards based on the current selectedView.
     }
-  }, [user, selectedView]);
+  }, [route.params?.refresh]);
 
   const onRefresh = () => {
     setRefreshing(true);

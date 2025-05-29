@@ -74,11 +74,67 @@ const PinDetailScreen = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+  const [deleteConfirmationVisible, setDeleteConfirmationVisible] = useState(false);
   const [commentDialogVisible, setCommentDialogVisible] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
   const { settings } = useSettings();
   const { darkMode } = settings;
+
+  // Check if currentUser and pin are available before accessing properties
+  // Pin owner could be in either pin.user or pin.postedBy depending on API response format
+  const isOwner = currentUser && pin && (
+    (pin.user && currentUser._id === pin.user._id) || 
+    (pin.user && typeof pin.user === 'string' && currentUser._id === pin.user) ||
+    (pin.postedBy && currentUser._id === pin.postedBy._id)
+  );
+  
+  // Log ownership status for debugging
+  console.log('Pin ownership check:', { 
+    currentUserId: currentUser?._id,
+    pinUserId: pin?.user?._id || pin?.user,
+    pinPostedById: pin?.postedBy?._id,
+    isOwner
+  });
+
+  const handleDeletePin = () => {
+    console.log('handleDeletePin function called');
+    setDeleteConfirmationVisible(true);
+    setMenuVisible(false);
+  };
+
+  const confirmDeletePin = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      console.log('Deleting pin with ID:', pinId);
+      console.log('Using token:', token ? 'Token exists' : 'No token');
+      
+      const response = await fetch(`${config.API_URL}/pins/${pinId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+          'Accept': 'application/json'
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to delete pin' }));
+        throw new Error(errorData.message);
+      }
+
+      // Show success message and close dialog
+      Alert.alert('Success', 'Pin deleted successfully');
+      setDeleteConfirmationVisible(false);
+      
+      // Navigate to Profile and set params to trigger a refresh
+      navigation.navigate('Profile', { refresh: true });
+    } catch (error) {
+      console.error('Error deleting pin:', error);
+      Alert.alert('Error', `Failed to delete pin: ${error.message}`);
+      setDeleteConfirmationVisible(false);
+    }
+  };
 
   const fetchPinDetails = async () => {
     try {
@@ -566,6 +622,7 @@ const PinDetailScreen = () => {
   // Wrap the entire render in a try-catch to prevent crashes
   try {
     return (
+      <>
       <ScrollView
         style={[styles.container, { backgroundColor: darkMode ? '#333' : '#fff' }]}
         refreshControl={
@@ -594,44 +651,84 @@ const PinDetailScreen = () => {
         <View style={styles.headerActions}>
           <View
             ref={anchorRef}
-
+            onLayout={(event) => {
+              // Store the position of this view when it's laid out
+              if (anchorRef.current) {
+                anchorRef.current.measure((x, y, width, height, pageX, pageY) => {
+                  setMenuPosition({ x: pageX, y: pageY + height });
+                });
+              }
+            }}
           >
             <IconButton
-              icon={() => <MaterialCommunityIcons name="dots-horizontal" size={24} color={darkMode ? '#fff' : '#000'} />}
-              onPress={() => {
-                anchorRef.current.measure((fx, fy, width, height, px, py) => {
-                  setMenuPosition({ x: px, y: py + height });
-                  setMenuVisible(true);
-                });
-              }}
+              icon={() => <MaterialCommunityIcons name="dots-horizontal" size={24} color={darkMode ? '#fff' : '#000'} />} 
+              onPress={() => setMenuVisible(true)}
             />
           </View>
-          {anchorRef.current && (
-            <Menu
-              visible={menuVisible}
-              onDismiss={() => setMenuVisible(false)}
-              anchor={{ x: menuPosition.x, y: menuPosition.y }}
-              style={{ backgroundColor: darkMode ? '#333' : '#fff' }}
-            >
-            <Menu.Item 
-              onPress={handleShare} 
-              title="Share" 
-              leadingIcon={() => <MaterialCommunityIcons name="share" size={24} color={darkMode ? '#fff' : '#000'} />}
-              titleStyle={{ color: darkMode ? '#fff' : '#000' }}
-            />
-            <Menu.Item 
-              onPress={handleCopyLink} 
-              title="Copy link" 
-              leadingIcon={() => <MaterialCommunityIcons name="link" size={24} color={darkMode ? '#fff' : '#000'} />}
-              titleStyle={{ color: darkMode ? '#fff' : '#000' }}
-            />
-            <Menu.Item 
-              onPress={handleReport} 
-              title="Report" 
-              leadingIcon={() => <MaterialCommunityIcons name="flag" size={24} color={darkMode ? '#fff' : '#000'} />}
-              titleStyle={{ color: darkMode ? '#fff' : '#000' }}
-            />
-            </Menu>
+          
+          {/* Use Portal for the menu to avoid layout issues */}
+          {menuVisible && (
+            <Portal>
+              <TouchableOpacity
+                style={StyleSheet.absoluteFill}
+                onPress={() => setMenuVisible(false)}
+              >
+                <View
+                  style={[
+                    styles.menuContainer,
+                    {
+                      position: 'absolute',
+                      top: menuPosition.y,
+                      left: menuPosition.x - 150, // Adjust based on menu width
+                      backgroundColor: darkMode ? '#333' : '#fff',
+                      borderRadius: 5,
+                      padding: 5,
+                      elevation: 5,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3.84,
+                      width: 200,
+                    },
+                  ]}
+                >
+                  <TouchableOpacity style={styles.menuItem} onPress={() => {
+                    handleShare();
+                    setMenuVisible(false);
+                  }}>
+                    <MaterialCommunityIcons name="share" size={24} color={darkMode ? '#fff' : '#000'} />
+                    <Text style={{ marginLeft: 10, color: darkMode ? '#fff' : '#000' }}>Share</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity style={styles.menuItem} onPress={() => {
+                    handleCopyLink();
+                    setMenuVisible(false);
+                  }}>
+                    <MaterialCommunityIcons name="link" size={24} color={darkMode ? '#fff' : '#000'} />
+                    <Text style={{ marginLeft: 10, color: darkMode ? '#fff' : '#000' }}>Copy link</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity style={styles.menuItem} onPress={() => {
+                    handleReport();
+                    setMenuVisible(false);
+                  }}>
+                    <MaterialCommunityIcons name="flag" size={24} color={darkMode ? '#fff' : '#000'} />
+                    <Text style={{ marginLeft: 10, color: darkMode ? '#fff' : '#000' }}>Report</Text>
+                  </TouchableOpacity>
+                  
+                  {isOwner && (
+                    <TouchableOpacity style={styles.menuItem} onPress={() => {
+                      console.log('Delete menu item clicked');
+                      handleDeletePin();
+                      setMenuVisible(false);
+                    }}>
+                      <MaterialCommunityIcons name="delete" size={24} color={darkMode ? '#fff' : '#000'} />
+                      <Text style={{ marginLeft: 10, color: darkMode ? '#fff' : '#000' }}>Delete Pin</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </TouchableOpacity>
+            </Portal>
           )}
         </View>
 
@@ -847,10 +944,31 @@ const PinDetailScreen = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-    </ScrollView>
-  );
-  } catch (error) {
-    console.error('Error rendering PinDetailScreen:', error);
+      </ScrollView>
+
+      {/* Delete Confirmation Dialog */}
+      <Portal>
+        <Dialog
+          visible={deleteConfirmationVisible}
+          onDismiss={() => setDeleteConfirmationVisible(false)}
+          style={{ backgroundColor: darkMode ? '#333' : '#fff' }}
+        >
+          <Dialog.Title style={{ color: darkMode ? '#fff' : '#000' }}>Delete Pin</Dialog.Title>
+          <Dialog.Content>
+            <Text style={{ color: darkMode ? '#fff' : '#000' }}>
+              Are you sure you want to delete this pin? This action cannot be undone.
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setDeleteConfirmationVisible(false)}>Cancel</Button>
+            <Button onPress={confirmDeletePin} color="#E60023">Delete</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+      </>
+    );
+  } catch (renderError) {
+    console.error('Error rendering PinDetailScreen:', renderError);
     return (
       <View style={[styles.container, styles.centered, { backgroundColor: darkMode ? '#333' : '#fff' }]}>
         <Text style={{ color: darkMode ? '#fff' : '#000', marginBottom: 16, textAlign: 'center' }}>
@@ -869,6 +987,16 @@ const PinDetailScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  menuContainer: {
+    zIndex: 1000,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#ccc',
+  },
   container: {
     flex: 1,
   },

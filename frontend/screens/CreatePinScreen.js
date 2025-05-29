@@ -161,13 +161,7 @@ const CreatePinScreen = () => {
         category: 'Art', // Using a valid category from the enum list
       };
 
-      console.log('Pin data being sent:', {
-        title: formData.title,
-        description: formData.description,
-        imageUrl: formData.imageUrl,
-        user: user._id,
-        category: 'Other',
-      });
+      console.log('Pin data being sent:', pinData);
       const response = await api.pinsAPI.createPin(pinData);
       console.log('Pin created successfully:', response);
       

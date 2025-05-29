@@ -193,8 +193,8 @@ export const pinsAPI = {
     }
     
     console.log('Creating pin with data:', JSON.stringify(pinData, null, 2));
-    console.log('User ID type:', typeof pinData.user);
-    console.log('User ID value:', pinData.user);
+    console.log('User ID type:', typeof pinData.userId);
+    console.log('User ID value:', pinData.userId);
     
     const response = await fetch(`${API_URL}/pins`, {
       method: 'POST',
