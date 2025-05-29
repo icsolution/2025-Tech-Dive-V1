@@ -192,9 +192,14 @@ export const pinsAPI = {
       throw new Error('No authentication token found');
     }
     
+    console.log('Creating pin with data:', JSON.stringify(pinData, null, 2));
+    console.log('User ID type:', typeof pinData.user);
+    console.log('User ID value:', pinData.user);
+    
     const response = await fetch(`${API_URL}/pins`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'x-auth-token': token,
         'Accept': 'application/json'
       },

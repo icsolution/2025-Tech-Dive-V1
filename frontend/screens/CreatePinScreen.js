@@ -13,6 +13,7 @@ import {
 import { TextInput, Button, Text, Surface, HelperText, IconButton } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getCurrentUser, dummyBoards } from '../data/dummyData';
 import { useSettings } from '../context/SettingsContext';
@@ -40,11 +41,13 @@ const CreatePinScreen = () => {
   console.log('User object in CreatePinScreen:', user);
 
   useEffect(() => {
+    console.log('CreatePinScreen mounted with user:', user);
+    console.log('Auth token exists:', !!AsyncStorage.getItem('token'));
     fetchBoards();
     if (initialBoardId) {
       console.log('Initial board ID from params:', initialBoardId);
     }
-  }, [initialBoardId]);
+  }, [initialBoardId, user]);
 
   const fetchBoards = async () => {
     console.log('User object in fetchBoards:', user);
@@ -126,6 +129,15 @@ const CreatePinScreen = () => {
 
   const handleSubmit = async () => {
     console.log('Submitting form data:', formData);
+    console.log('Current user state:', user);
+    console.log('Auth token exists:', !!(await AsyncStorage.getItem('token')));
+    
+    if (!user) {
+      setError('You must be logged in to create a pin');
+      console.error('No user found when trying to submit pin');
+      return;
+    }
+
     if (!formData.title || !formData.imageUrl || !formData.boardId) {
       console.log('Missing fields:', {
         title: !formData.title,
@@ -146,11 +158,26 @@ const CreatePinScreen = () => {
         imageUrl: formData.imageUrl,
         boardId: formData.boardId,
         userId: user._id,
-        category: 'Other',
+        category: 'Art', // Using a valid category from the enum list
       };
 
+      console.log('Pin data being sent:', {
+        title: formData.title,
+        description: formData.description,
+        imageUrl: formData.imageUrl,
+        user: user._id,
+        category: 'Other',
+      });
       const response = await api.pinsAPI.createPin(pinData);
       console.log('Pin created successfully:', response);
+      
+      // Dispatch the refreshHome event to trigger HomeScreen refresh
+      navigation.dispatch({
+        type: 'NAVIGATE',
+        payload: {
+          name: 'refreshHome',
+        },
+      });
       
       navigation.goBack();
       setModalVisible(false);
@@ -250,11 +277,18 @@ const CreatePinScreen = () => {
 
               <TouchableOpacity
                 onPress={() => {
+                  console.log('[Select Board Button] Clicked');
+                  console.log('[Select Board Button] Current boards.length:', boards.length);
                   if (boards.length === 0) {
+                    console.log('[Select Board Button] Navigating to CreateBoard because no boards exist.');
+                    navigation.goBack(); // Dismiss CreatePinScreen modal
                     navigation.navigate('CreateBoard');
                     return;
                   }
+                  console.log('[Select Board Button] Attempting to open modal. Current selectBoardModalVisible:', selectBoardModalVisible);
                   setSelectBoardModalVisible(true);
+                  // It's tricky to log the state immediately after setting due to async nature of setState
+                  // but we can check it in a useEffect or by observing the modal's behavior
                 }}
                 style={[
                   styles.boardSelector,

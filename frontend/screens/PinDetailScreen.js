@@ -207,14 +207,14 @@ const PinDetailScreen = () => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
       // Check if the action is going back
       if (e.data.action.type === 'GO_BACK') {
-        // Trigger refresh on ProfileScreen
+        // Dispatch the refreshProfile event to update ProfileScreen
         navigation.dispatch({
-          ...e.data.action,
+          type: 'NAVIGATE',
           payload: {
-            ...e.data.action.payload,
-            params: { refresh: true },
+            name: 'refreshProfile',
           },
         });
+        console.log('Dispatched refreshProfile event on navigation back');
       }
     });
 
@@ -378,21 +378,117 @@ const PinDetailScreen = () => {
     try {
       console.log('Starting handleSave with pinId:', pinId);
       
-      // Ensure pinId is a valid value
-      if (!pinId) {
-        console.error('Invalid pinId:', pinId);
+      // Validate pinId
+      if (!pinId || !isValidObjectId(pinId)) {
+        console.error('Invalid pinId format:', pinId);
+        Alert.alert('Error', 'Cannot save: Invalid pin ID format');
         return;
       }
       
-      // Use the context function to toggle save
-      const updatedPin = await toggleSave(pinId, currentUser._id);
-      if (updatedPin) {
-        setPin(updatedPin);
-        setIsSaved(!isSaved);
-        console.log('Pin saved state updated successfully');
+      // Check if user is authenticated
+      if (authLoading) {
+        console.log('Auth is still loading, waiting...');
+        return; // Wait for auth to load
+      }
+      
+      // Validate user is logged in
+      if (!currentUser) {
+        console.error('No current user found - not logged in');
+        Alert.alert(
+          'Authentication Required',
+          'Please log in to save pins',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { 
+              text: 'Log In', 
+              onPress: () => navigation.navigate('Login') 
+            }
+          ]
+        );
+        return;
+      }
+      
+      // Validate user ID exists
+      if (!currentUser._id) {
+        console.error('User is logged in but has no ID');
+        Alert.alert('Error', 'User account is invalid. Please log out and log in again.');
+        return;
+      }
+      
+      // Format the user ID to ensure it's a valid ObjectId string
+      const formattedUserId = formatObjectId(currentUser._id);
+      if (!formattedUserId) {
+        console.error('Invalid user ID format:', currentUser._id);
+        Alert.alert(
+          'Error',
+          'Your user ID is in an invalid format. Please log out and log in again.'
+        );
+        return;
+      }
+      
+      // Get current save state before optimistic update
+      const wasSaved = isSaved;
+      console.log('Current save state:', wasSaved ? 'Saved' : 'Not saved');
+      
+      // Apply optimistic update for better UX
+      setIsSaved(!wasSaved);
+      
+      try {
+        console.log('Calling toggleSave with pinId:', pinId, 'and userId:', formattedUserId);
+        
+        // Use the context function to toggle save with the formatted user ID
+        const updatedPin = await toggleSave(pinId, formattedUserId);
+        
+        if (updatedPin) {
+          console.log('Pin updated successfully:', {
+            id: updatedPin._id,
+            saves: updatedPin.saves?.length || 0,
+            isSaved: updatedPin.saves?.some(id => formatObjectId(id) === formattedUserId)
+          });
+          
+          // Update the pin data with server response
+          setPin(updatedPin);
+          
+          // Ensure the save state matches the server state
+          const serverSaveState = updatedPin.saves?.some(id => 
+            formatObjectId(id) === formattedUserId
+          );
+          
+          if (serverSaveState !== !wasSaved) {
+            console.log('Correcting save state to match server:', serverSaveState);
+            setIsSaved(serverSaveState);
+          }
+          
+          // Dispatch refreshProfile event to update ProfileScreen
+          navigation.dispatch({
+            type: 'NAVIGATE',
+            payload: {
+              name: 'refreshProfile',
+            },
+          });
+          console.log('Dispatched refreshProfile event after save/unsave');
+        }
+      } catch (error) {
+        // Revert optimistic update on error
+        console.error('Error toggling save:', error);
+        setIsSaved(wasSaved);
+        
+        // Show appropriate error message based on error type
+        if (error.message?.includes('User not found')) {
+          Alert.alert(
+            'Authentication Error',
+            'Your session has expired. Please log in again.'
+          );
+        } else if (error.message?.includes('Pin not found')) {
+          Alert.alert('Error', 'This pin no longer exists.');
+          navigation.goBack();
+        } else {
+          Alert.alert('Error', `Failed to ${wasSaved ? 'unsave' : 'save'} pin. Please try again.`);
+        }
       }
     } catch (error) {
-      console.error('Error saving pin:', error);
+      console.error('Unexpected error in handleSave:', error);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     }
   };
 

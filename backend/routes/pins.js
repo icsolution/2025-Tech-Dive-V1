@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
     await pin.save();
     res.status(201).json(pin);
   } catch (error) {
-    console.error('Create pin error:', error);
+    console.error('Create pin error:', error.message, error.stack); // Log specific error message and stack
     res.status(500).json({ message: 'Server error' });
   }
 });

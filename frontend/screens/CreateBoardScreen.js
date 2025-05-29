@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,10 +9,16 @@ import {
 import { TextInput, Button, Text, Surface, HelperText } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
-import { getCurrentUser, dummyBoards } from '../data/dummyData';
+import { useAuth } from '../context/AuthContext';
+import * as api from '../services/api';
 
 const CreateBoardScreen = () => {
+  useEffect(() => {
+    console.log('CreateBoardScreen mounted!');
+  }, []);
+
   const navigation = useNavigation();
+  const { user } = useAuth(); // Get user from AuthContext
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -49,28 +55,24 @@ const CreateBoardScreen = () => {
     setError('');
 
     try {
-      // Create new board with dummy data
-      const currentUser = getCurrentUser();
-      const newBoard = {
-        _id: `board_${Date.now()}`,
-        name: formData.name,
+      if (!user || !user._id) {
+        setError('User not authenticated. Cannot create board.');
+        return;
+      }
+
+      const boardData = {
+        title: formData.name,
         description: formData.description,
-        coverImage: formData.coverImage || 'https://via.placeholder.com/300',
+        coverImage: formData.coverImage || '', // Backend might handle default
         isPrivate: formData.isPrivate,
-        author: currentUser,
-        collaborators: [],
-        pins: [],
-        followers: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        userId: user._id, // Pass the user ID to the backend
       };
 
-      console.log('Created dummy board:', newBoard);
+      console.log('Attempting to create board with data:', boardData);
+      const response = await api.boardsAPI.createBoard(boardData);
+      console.log('Board created successfully:', response);
       
-      // Add the new board to the dummyBoards array
-      dummyBoards.push(newBoard);
-      
-      // Navigate back
+      // Navigate back or to board detail
       navigation.goBack();
     } catch (error) {
       console.error('Error creating board:', error);
